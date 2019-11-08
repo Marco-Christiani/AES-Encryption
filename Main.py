@@ -21,8 +21,6 @@ def encrypt(seed, plaintext):
         # padding = ['00' for i in range(bytes_to_pad)]
         # current_block = padding + plaintext_bytes
 
-
-
         ctext = wrap(ctext, 2)  # Break into bytes
 
         ctext = add_round_key(roundkey, ctext)  # Add round key
