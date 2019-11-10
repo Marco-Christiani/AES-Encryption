@@ -42,7 +42,7 @@ class Matrix:
 
             # Add columns of temp_mat together
             result_vec = np.zeros(4)
-            result_vec_str = np.empty(4, dtype='U2') # column of final matrix
+            result_vec_str = np.empty(4, dtype='U2')  # column of final matrix
             for p in range(4):
                 row = temp_mat[p, :]
                 for elem in row:
@@ -52,10 +52,10 @@ class Matrix:
             self.matrix[i, :] = result_vec_str
 
     def flatten_cols(self):
-        return ''.join(self.matrix.flatten())
+        return self.matrix.flatten()
 
     def flatten_rows(self):
-        return ''.join(self.matrix.flatten(order='F'))
+        return self.matrix.flatten(order='F')
 
     def __str__(self):
         return ''.join(self.matrix.flatten(order='F'))
