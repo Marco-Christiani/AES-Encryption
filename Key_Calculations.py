@@ -1,4 +1,6 @@
 import numpy as np
+from BlockStream import ByteMode
+from textwrap import wrap
 
 DEBUG = False
 POLYCONSTANT = 0b100011011
@@ -20,33 +22,45 @@ SBOX = ['63', '7C', '77', '7B', 'F2', '6B', '6F', 'C5', '30', '01', '67', '2B', 
 
 
 class KeySchedule:
-
     def __init__(self, seed):
         self.key = []  # byte array as strings i.e. ['0a', '2f', ...]
         self.key_schedule = []  # expanded key broken into round keys
-        seed = [seed[i:i + 2] for i in range(0, len(seed), 2)]  # break into array of pairs
+        self.curr_round = 0
+        seed = wrap(seed, 2)
         seedlen = len(seed)
-        if seedlen == 16:
+        if seedlen == ByteMode.b16.value:
+            self.byte_mode = ByteMode.b16
+            self.rounds = 10
             self.key_expansion_128(seed)
-        elif seedlen == 24:
+
+        elif seedlen == ByteMode.b24.value:
+            self.byte_mode = ByteMode.b24
+            self.rounds = 12
             self.key_expansion_192(seed)
-        elif seedlen == 32:
+
+        elif seedlen == ByteMode.b32.value:
+            self.byte_mode = ByteMode.b32
+            self.rounds = 14
             self.key_expansion_256(seed)
         else:
             raise Exception('Key length must be 16, 24, or 32 bytes.')
 
-    # seed: array of hex digits [A2, 5D, E4...]
     def key_expansion_128(self, seed):
+        """
+        seed: array of hex digits [A2, 5D, E4...]
+        :param seed:
+        :return:
+        """
         key = seed
         count = 0
         while len(key) < 176:
             for i in range(4):
                 key_len = len(key)
-                temp1 = key[key_len-4 : key_len] # last 4 bytes
+                temp1 = key[key_len-4:key_len]  # last 4 bytes
                 if i == 0:
                     temp1 = key_expansion_core(temp1, count)
                     count += 1
-                temp2 = key[key_len-16 : key_len] # temp2 (last 16 bytes)
+                temp2 = key[key_len-16:key_len] # temp2 (last 16 bytes)
                 temp2 = temp2[0:4] # first 4 of last 16 bytes
                 result = []
                 for j in range(4):
@@ -57,26 +71,61 @@ class KeySchedule:
                     print('Result:', result)
                     print('-'*40)
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
+        self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
 
-    # 192 byte expansion
-    # seed: array of 1's and 0's as strings
     def key_expansion_192(self, seed):
+        """
+        192 byte expansion
+        seed: array of 1's and 0's as strings
+        :param seed:
+        :return:
+        """
         return None
 
-    # 256 byte expansion is a special case
     def key_expansion_256(self, seed):
+        """
+        256 byte expansion is a special case
+        :param seed:
+        :return:
+        """
         return None
 
     def get_keyschedule(self):
         return self.key_schedule
 
+    def is_final_round(self):
+        return self.rounds == self.curr_round
 
-# key: array of hex digits as strings ie [A2, 5D, ..]
+    def get_next_key(self):
+        """
+        Gets next key from 0 to num_keys
+        :return:
+        """
+        result = self.key_schedule[self.curr_round]
+        self.curr_round += 1
+        return result
+
+    def get_byte_mode(self):
+        return self.byte_mode
+
+    def get_num_rounds(self):
+        return self.rounds
+
+    def reset_roundkey_count(self):
+        self.curr_round = 0
+
+
 def key_expansion_core(key, i):
-    key = np.roll(key, -1) # rotate_left
+    """
+    :param key: array of hex digits as strings ie [A2, 5D, ..]
+    :param i: number of times this function has been called
+    """
+    key = np.roll(key, -1)  # rotate_left
     # key = [SBOX[ hexstr_to_int(c) ] for c in key] # s_box
+    # print(key)
     key = sub_bytes(key)
+    key = wrap(key, 2)
 
     rcon = 2**i # calculate x^i
     if i == 8:
@@ -84,33 +133,38 @@ def key_expansion_core(key, i):
     if i == 9:
         rcon = rcon ^ (POLYCONSTANT << 1)
 
-    xor = rcon^hexstr_to_int(key[0])  # XOR rcon with the first byte of key
-    xor = xor%POLYCONSTANT
+    xor = rcon ^ hexstr_to_int(key[0])  # XOR rcon with the first byte of key
+    xor = xor % POLYCONSTANT
 
     key[0] = hex(xor).split('0x')[1]  # convert ints in key to hex strings
     key[0] = int_to_hexstr(xor)
 
     return key
 
-# x: hex digits as string ie 'A2'
-# y: hex digits as string ie 'A2'
-# return: x XOR y as string
+
 def get_XOR(x, y):
+    """
+    :param x: hex digits as string ie 'A2'
+    :param y: x XOR y as string
+    :return:
+    """
     result = hexstr_to_int(x) ^ hexstr_to_int(y)
     result = int_to_hexstr(result)
-    # if len(result) == 1:
-    #     result = '0'+result  # pad with 0
     return result
 
 
-# key and text are arrays of bytes
-# len(key) == len(text)
 def add_round_key(key, text):
-    result = []
-    # kbytes = wrap(key, 2)
-    # tbytes = wrap(text, 2)
-    for kbyte, tbyte in zip(key, text):
-        result.append(get_XOR(kbyte, tbyte))
+    """
+    len(key) == len(text)
+    :param key: array of bytes
+    :param text: array of bytes
+    :return:
+    """
+    result = ''
+    kbytes = wrap(key, 2)
+    tbytes = wrap(text, 2)
+    for kbyte, tbyte in zip(kbytes, tbytes):
+        result += get_XOR(kbyte, tbyte)
     return result
 
 
@@ -126,19 +180,6 @@ def int_to_hexstr(number):
 
 
 def sub_bytes(bytes):
-    return [SBOX[hexstr_to_int(b)] for b in bytes]
-
-
-def test_keyschedule(seed):
-    key_sch = KeySchedule(seed)
-    # for i in range(1, 12):
-    #     print(key_sch.get_round_key(i))
-    for roundkey in key_sch.key_schedule:
-        print(''.join(roundkey))
-
-
-# test_keyschedule('12476278dbc36bd9dc2cf5716a43b4bb')
-
-
-
-
+    if type(bytes) is str:
+        bytes = wrap(bytes, 2)
+    return ''.join([SBOX[hexstr_to_int(b)] for b in bytes])
