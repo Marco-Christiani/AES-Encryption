@@ -1,52 +1,59 @@
 from Key_Calculations import *
 from Matrix_Calculations import *
 from BlockStream import *
-from textwrap import wrap
 from prettytable import PrettyTable
 
 
-def encrypt(seed, plaintext):
+def encrypt(seed, plaintext, verbose=False):
+    result = PrettyTable(field_names=None)
     table = PrettyTable()
-    table.field_names = ['Round', 'Operation', 'Byte String']
-    table.align['Operation'] = 'l'
-
     key_sch = KeySchedule(seed)
+    byte_mode = key_sch.get_byte_mode()
+    block_stream = BlockStream(plaintext, BlockMode.ECB, byte_mode)
+    ctext_result = ''
 
-    rounds = -1
-    block_stream = BlockStream(plaintext, BlockMode.ECB, ByteMode.b16)
-    ctext = block_stream.get_next_block()
-    table.add_row(['', 'Current Block', ''.join(ctext)])
+    while not block_stream.is_empty():
+        # Get next plaintext block
+        ctext = block_stream.get_next_block()
+        table.field_names = ['Round', 'Operation',
+                             'Byte String']  # Create Table for new block
+        table.align['Operation'] = 'l'
+        table.add_row(['', 'Current Block', ctext])
 
-    # Encrypt block -------------------------------------------------------
+        # Encrypt block -------------------------------------------------------
+        for round_num in range(key_sch.get_num_rounds()):
+            roundkey = key_sch.get_next_key()
 
-    for roundkey in key_sch.get_keyschedule():
-        ctext = add_round_key(roundkey, ctext)  # Add round key
-        table.add_row([rounds, f'Add Round Key', ''.join(ctext)])
-        ctext = sub_bytes(ctext)  # Sub bytes
-        table.add_row(['', 'Sub Bytes', ''.join(ctext)])
+            ctext = add_round_key(roundkey, ctext)  # Add round key
+            table.add_row([round_num, f'Add Round Key', ctext])
 
-        mat = Matrix(''.join(ctext))  # Convert to 4x4 byte matrix
-        mat.shift_rows()  # Shift rows
-        table.add_row(['', 'Shift Rows', ''.join(mat.flatten_rows())])
+            ctext = sub_bytes(ctext)  # Sub bytes
+            table.add_row(['', 'Sub Bytes', ctext])
 
-        if rounds == 8:
+            mat = Matrix(ctext)  # Convert to 4x4 byte matrix
+            mat.shift_rows()  # Shift rows
+            table.add_row(['', 'Shift Rows', mat.flatten_rows()])
+
+            # if rounds == 8:
+            if key_sch.is_final_round():
+                final_key = key_sch.get_next_key()
+                ctext = mat.flatten_rows()
+                ctext = add_round_key(final_key, ctext)  # Add final round key
+                table.add_row(['', f'Add Round Key', ctext])
+                break
+            mat.mix_columns()  # Mix Columns
+            table.add_row(['', 'Mix Columns', mat.flatten_cols()])
+            ctext = mat.flatten_cols()
+
             table.add_row(['', '', ''])
-            final_key = key_sch.get_keyschedule()[-1]
-            ctext = mat.flatten_rows()
-            ctext = add_round_key(final_key, ctext)  # Add final round key
-            table.add_row([rounds+1, f'Add Round Key', ''.join(ctext)])
-            break
-        mat.mix_columns()  # Mix Columns
-        table.add_row(['', 'Mix Columns', ''.join(mat.flatten_cols())])
-        ctext = mat.flatten_cols()
+        if verbose:
+            result.add_row([f'Block {block_stream.get_block_num()} Ciphertext:', ctext])
+            result.header = False
+            result.vrules = 0
+            print(table)
+        ctext_result += ''.join(ctext)
+        key_sch.reset_roundkey_count()
 
-        table.add_row(['', '', ''])
-        rounds += 1
-    print(table)
-
-# encrypt('12476278dbc36bd9dc2cf5716a43b4bb', 'this is the text to encrypt')
-encrypt('12476278dbc36bd9dc2cf5716a43b4bb', 'A01478BE92570366F1D13C098726DAC5')
-
-
-
-
+    print(result)
+    print('Encrypted Message:', ctext_result)
+    return ctext_result

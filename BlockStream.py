@@ -46,4 +46,12 @@ class BlockStream:
     def get_next_block(self):
         block = self.blockstream[self.curr_block]
         self.curr_block += 1
-        return block
+        return ''.join(block)
+
+    def get_block_num(self):
+        return self.curr_block
+
+    def is_empty(self):
+        return len(self.blockstream) == self.curr_block
+
+
