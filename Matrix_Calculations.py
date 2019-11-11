@@ -3,14 +3,16 @@ from textwrap import wrap
 from Key_Calculations import hexstr_to_int, int_to_hexstr
 
 POLYCONSTANT = 0b100011011
+MIX_ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
 
 
 class Matrix:
     def __init__(self, data):
         self.matrix = np.empty([4, 4], dtype='U2')
         i = 0
-        for byte in wrap(data, 2):
-            self.matrix[i % 4][i//4] = byte
+        data =  wrap(data, 2)
+        for byte in data:
+            self.matrix[i % 4][i // 4] = byte
             i += 1
 
     def shift_rows(self):
@@ -20,11 +22,6 @@ class Matrix:
             i += 1
 
     def mix_columns(self):
-        mix_arr = np.array([[2, 3, 1, 1],
-                            [1, 2, 3, 1],
-                            [1, 1, 2, 3],
-                            [3, 1, 1, 2]])
-
         matrix_as_num = np.zeros([4, 4])
         i = 0
         for row in self.matrix:
@@ -35,10 +32,12 @@ class Matrix:
         temp_mat = np.zeros([4, 4])
         for i in range(4):
             col = matrix_as_num[:, i]
-            for j in range(4):  # For each column of mix matrix, multiply by element in current matrix column
+            # For each column of mix matrix, multiply by element in current matrix column
+            for j in range(4):
                 elem = col[j]
                 for k in range(4):
-                    temp_mat[k, j] = mult(elem, mix_arr[k, j])  # ^ POLYCONSTANT
+                    temp_mat[k, j] = mult(elem,
+                                          MIX_ARR[k, j])  # ^ POLYCONSTANT
 
             # Add columns of temp_mat together
             result_vec = np.zeros(4)
@@ -46,16 +45,19 @@ class Matrix:
             for p in range(4):
                 row = temp_mat[p, :]
                 for elem in row:
-                    result_vec[p] = int(elem) ^ int(result_vec[p])  # ^ POLYCONSTANT  # sum all elements in row
+                    result_vec[p] = int(elem) ^ int(
+                        result_vec[p]
+                    )  # ^ POLYCONSTANT  # sum all elements in row
                 temp = mod_p(result_vec[p])
-                result_vec_str[p] = int_to_hexstr(temp)  # Convert to hex without 0x
+                result_vec_str[p] = int_to_hexstr(
+                    temp)  # Convert to hex without 0x
             self.matrix[i, :] = result_vec_str
 
     def flatten_cols(self):
-        return self.matrix.flatten()
+        return ''.join(self.matrix.flatten())
 
     def flatten_rows(self):
-        return self.matrix.flatten(order='F')
+        return ''.join(self.matrix.flatten(order='F'))
 
     def __str__(self):
         return ''.join(self.matrix.flatten(order='F'))
@@ -78,7 +80,8 @@ def mod_p(number):
     bit_rep = bin(int(number))
     num_bits = len([c for c in bit_rep.split('0b')[1]])
     if num_bits > 8:
-        modconstant = POLYCONSTANT << (num_bits-9)  # Left align POLYCONSTANT with number
+        modconstant = POLYCONSTANT << (num_bits - 9
+                                       )  # Left align POLYCONSTANT with number
         return int(number) ^ modconstant
     return int(number)
 
