@@ -47,9 +47,8 @@ class KeySchedule:
 
     def key_expansion_128(self, seed):
         """
-        seed: array of hex digits [A2, 5D, E4...]
-        :param seed:
-        :return:
+        128 byte expansion
+        :param seed: array of hex digits [A2, 5D, E4...]
         """
         key = seed
         count = 0
@@ -61,7 +60,7 @@ class KeySchedule:
                     temp1 = key_expansion_core(temp1, count)
                     count += 1
                 temp2 = key[key_len-16:key_len] # temp2 (last 16 bytes)
-                temp2 = temp2[0:4] # first 4 of last 16 bytes
+                temp2 = temp2[0:4]  # first 4 of last 16 bytes
                 result = []
                 for j in range(4):
                     result.append(get_XOR(temp1[j], temp2[j]))
@@ -77,11 +76,30 @@ class KeySchedule:
     def key_expansion_192(self, seed):
         """
         192 byte expansion
-        seed: array of 1's and 0's as strings
-        :param seed:
-        :return:
+        :param seed: array of hex digits [A2, 5D, E4...]
         """
-        return None
+        key = seed
+        count = 0
+        while len(key) < 208:
+            for i in range(6):
+                key_len = len(key)
+                temp1 = key[key_len-4:key_len]  # last 4 bytes
+                if i == 0:
+                    temp1 = key_expansion_core(temp1, count)
+                    count += 1
+                temp2 = key[key_len-24:key_len] # temp2 (last 24 bytes)
+                temp2 = temp2[0:4]  # first 4 of last 24 bytes
+                result = []
+                for j in range(4):
+                    result.append(get_XOR(temp1[j], temp2[j]))
+                key += result
+
+        self.key_schedule = [key[i:i + 24] for i in range(0, len(key), 24)]
+        self.key_schedule = [''.join(key) for key in self.key_schedule]
+        self.key = key
+        if DEBUG:
+            print(f'key is {key}')
+            print(f'Length is {len(key)}')
 
     def key_expansion_256(self, seed):
         """
