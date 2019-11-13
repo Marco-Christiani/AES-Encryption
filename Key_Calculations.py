@@ -1,5 +1,4 @@
 import numpy as np
-from BlockStream import ByteMode
 from textwrap import wrap
 
 DEBUG = False
@@ -28,18 +27,15 @@ class KeySchedule:
         self.curr_round = 0
         seed = wrap(seed, 2)
         seedlen = len(seed)
-        if seedlen == ByteMode.b16.value:
-            self.byte_mode = ByteMode.b16
+        if seedlen == 16:
             self.rounds = 10
             self.key_expansion_128(seed)
 
-        elif seedlen == ByteMode.b24.value:
-            self.byte_mode = ByteMode.b24
+        elif seedlen == 24:
             self.rounds = 12
             self.key_expansion_192(seed)
 
-        elif seedlen == ByteMode.b32.value:
-            self.byte_mode = ByteMode.b32
+        elif seedlen == 32:
             self.rounds = 14
             self.key_expansion_256(seed)
         else:
@@ -87,7 +83,7 @@ class KeySchedule:
                 if i == 0:
                     temp1 = key_expansion_core(temp1, count)
                     count += 1
-                temp2 = key[key_len-24:key_len] # temp2 (last 24 bytes)
+                temp2 = key[key_len-24:key_len]  # temp2 (last 24 bytes)
                 temp2 = temp2[0:4]  # first 4 of last 24 bytes
                 result = []
                 for j in range(4):
@@ -109,9 +105,6 @@ class KeySchedule:
         """
         return None
 
-    def get_keyschedule(self):
-        return self.key_schedule
-
     def is_final_round(self):
         return self.rounds == self.curr_round
 
@@ -123,9 +116,6 @@ class KeySchedule:
         result = self.key_schedule[self.curr_round]
         self.curr_round += 1
         return result
-
-    def get_byte_mode(self):
-        return self.byte_mode
 
     def get_num_rounds(self):
         return self.rounds
@@ -174,8 +164,8 @@ def get_XOR(x, y):
 def add_round_key(key, text):
     """
     len(key) == len(text)
-    :param key: array of bytes
-    :param text: array of bytes
+    :param key: string of bytes
+    :param text: string of bytes
     :return:
     """
     result = ''

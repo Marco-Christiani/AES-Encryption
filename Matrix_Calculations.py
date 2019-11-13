@@ -84,13 +84,3 @@ def mod_p(number):
                                        )  # Left align POLYCONSTANT with number
         return int(number) ^ modconstant
     return int(number)
-
-
-def test_matrix():
-    x = Matrix('A329BC0FE755486D2181003EDA479059')
-    print(x)
-    x.mix_columns()
-    print(x)
-
-
-# test_matrix()

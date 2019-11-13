@@ -1,30 +1,16 @@
-from enum import Enum
 from textwrap import wrap
 
 
-class BlockMode(Enum):
-    ECB = 1
-    CBC = 2
-
-
-class ByteMode(Enum):
-    b16 = 16
-    b24 = 24
-    b32 = 32
-
-
 class BlockStream:
-    def __init__(self, textstream, block_mode: BlockMode):
+    def __init__(self, textstream):
         self.textstream = textstream
         self.blockstream = []
         self.curr_block = 0
         self.blocksize = 16  # 16 bytes
-        if block_mode is BlockMode.ECB:
-            self.parse_ecb_blocks()
-        elif block_mode is BlockMode.CBC:
-            self.parse_cbc_blocks()
+        self.parse_blocks()
 
-    def parse_ecb_blocks(self):
+
+    def parse_blocks(self):
         bytes = wrap(self.textstream, 2)
         full_blocks = [bytes[i:i+self.blocksize] for i in range(0, len(bytes), self.blocksize)]
         self.blockstream = full_blocks
@@ -40,8 +26,6 @@ class BlockStream:
             padded_block += partial_block
             self.blockstream = full_blocks+padded_block
 
-    def parse_cbc_blocks(self):
-        return NotImplemented
 
     def get_next_block(self):
         block = self.blockstream[self.curr_block]
