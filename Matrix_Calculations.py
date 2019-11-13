@@ -7,10 +7,12 @@ MIX_ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
 
 
 class Matrix:
-    def __init__(self, data):
+    def __init__(self, data, byte_mode
+
+                 ):
         self.matrix = np.empty([4, 4], dtype='U2')
         i = 0
-        data =  wrap(data, 2)
+        data = wrap(data, 2)
         for byte in data:
             self.matrix[i % 4][i // 4] = byte
             i += 1

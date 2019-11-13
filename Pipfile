@@ -9,6 +9,7 @@ verify_ssl = true
 numpy = "*"
 tabulate = "*"
 prettytable = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.7"
