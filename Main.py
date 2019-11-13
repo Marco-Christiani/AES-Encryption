@@ -9,7 +9,7 @@ def encrypt(seed, plaintext, verbose=False):
     table = PrettyTable()
     key_sch = KeySchedule(seed)
     byte_mode = key_sch.get_byte_mode()
-    block_stream = BlockStream(plaintext, BlockMode.ECB, byte_mode)
+    block_stream = BlockStream(plaintext.lower(), BlockMode.ECB, byte_mode)
     ctext_result = ''
 
     while not block_stream.is_empty():
@@ -19,7 +19,6 @@ def encrypt(seed, plaintext, verbose=False):
                              'Byte String']  # Create Table for new block
         table.align['Operation'] = 'l'
         table.add_row(['', 'Current Block', ctext])
-
         # Encrypt block -------------------------------------------------------
         for round_num in range(key_sch.get_num_rounds()):
             roundkey = key_sch.get_next_key()
@@ -30,11 +29,10 @@ def encrypt(seed, plaintext, verbose=False):
             ctext = sub_bytes(ctext)  # Sub bytes
             table.add_row(['', 'Sub Bytes', ctext])
 
-            mat = Matrix(ctext)  # Convert to 4x4 byte matrix
+            mat = Matrix(ctext, byte_mode)  # Convert to BxB byte matrix where B=byte_mode
             mat.shift_rows()  # Shift rows
             table.add_row(['', 'Shift Rows', mat.flatten_rows()])
 
-            # if rounds == 8:
             if key_sch.is_final_round():
                 final_key = key_sch.get_next_key()
                 ctext = mat.flatten_rows()
