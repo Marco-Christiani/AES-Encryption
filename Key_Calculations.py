@@ -94,7 +94,7 @@ class KeySchedule:
                     result.append(get_XOR(temp1[j], temp2[j]))
                 key += result
 
-        self.key_schedule = [key[i:i + 24] for i in range(0, len(key), 24)]
+        self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
         if DEBUG:

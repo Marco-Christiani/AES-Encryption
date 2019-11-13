@@ -8,8 +8,7 @@ def encrypt(seed, plaintext, verbose=False):
     result = PrettyTable(field_names=None)
     table = PrettyTable()
     key_sch = KeySchedule(seed)
-    byte_mode = key_sch.get_byte_mode()
-    block_stream = BlockStream(plaintext.lower(), BlockMode.ECB, byte_mode)
+    block_stream = BlockStream(plaintext.lower(), BlockMode.ECB)
     ctext_result = ''
 
     while not block_stream.is_empty():
@@ -29,7 +28,7 @@ def encrypt(seed, plaintext, verbose=False):
             ctext = sub_bytes(ctext)  # Sub bytes
             table.add_row(['', 'Sub Bytes', ctext])
 
-            mat = Matrix(ctext, byte_mode)  # Convert to BxB byte matrix where B=byte_mode
+            mat = Matrix(ctext)  # Convert to 4x4 byte matrix
             mat.shift_rows()  # Shift rows
             table.add_row(['', 'Shift Rows', mat.flatten_rows()])
 

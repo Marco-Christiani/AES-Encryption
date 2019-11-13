@@ -7,9 +7,7 @@ MIX_ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
 
 
 class Matrix:
-    def __init__(self, data, byte_mode
-
-                 ):
+    def __init__(self, data: str):
         self.matrix = np.empty([4, 4], dtype='U2')
         i = 0
         data = wrap(data, 2)

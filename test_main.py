@@ -12,14 +12,9 @@ class TestMain(TestCase):
         ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19'
         result = encrypt(seed, ptext, verbose=VERBOSE)
         self.assertEqual(ctext, result)
+        print('-'*40)
 
-    def test_decrypt_128(self):
-        seed = '12476278dbc36bd9dc2cf5716a43b4bb'
-        ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19'
-        ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
 
-        result = decrypt(seed, ctext, verbose=VERBOSE)
-        self.assertEqual(ptext, result)
 
     def test_encrypt_192(self):
         seed = '9d1e29e03b24b556c16744b9fd5ba204b24b9d1e29e056c1'
@@ -29,6 +24,14 @@ class TestMain(TestCase):
         result = encrypt(seed, ptext, verbose=VERBOSE)
         self.assertEqual(ctext, result)
 
+    # def test_decrypt_128(self):
+    #     seed = '12476278dbc36bd9dc2cf5716a43b4bb'
+    #     ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19'
+    #     ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
+    #
+    #     result = decrypt(seed, ctext, verbose=VERBOSE)
+    #     self.assertEqual(ptext, result)
+    #
     # def test_padding(self):
     #     # ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48'
     #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
