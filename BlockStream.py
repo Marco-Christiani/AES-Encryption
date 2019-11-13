@@ -14,11 +14,11 @@ class ByteMode(Enum):
 
 
 class BlockStream:
-    def __init__(self, textstream, block_mode: BlockMode, byte_mode: ByteMode):
+    def __init__(self, textstream, block_mode: BlockMode):
         self.textstream = textstream
-        self.byte_mode = byte_mode.value
         self.blockstream = []
         self.curr_block = 0
+        self.blocksize = 16  # 16 bytes
         if block_mode is BlockMode.ECB:
             self.parse_ecb_blocks()
         elif block_mode is BlockMode.CBC:
@@ -26,16 +26,16 @@ class BlockStream:
 
     def parse_ecb_blocks(self):
         bytes = wrap(self.textstream, 2)
-        full_blocks = [bytes[i:i+self.byte_mode] for i in range(0, len(bytes), self.byte_mode)]
+        full_blocks = [bytes[i:i+self.blocksize] for i in range(0, len(bytes), self.blocksize)]
         self.blockstream = full_blocks
 
-        partial_block_size = len(bytes) % self.byte_mode
+        partial_block_size = len(bytes) % self.blocksize
         partial_block_start = len(bytes) - partial_block_size
         if partial_block_size > 0:
             partial_block = bytes[partial_block_start:len(bytes)+partial_block_size]
             padded_block = []
             # Pad final last block with 0's
-            for i in range(self.byte_mode-partial_block_size):
+            for i in range(self.blocksize-partial_block_size):
                 padded_block.append(0)
             padded_block += partial_block
             self.blockstream = full_blocks+padded_block
