@@ -61,13 +61,16 @@ class KeySchedule:
                 for j in range(4):
                     result.append(get_XOR(temp1[j], temp2[j]))
                 key += result
-                if DEBUG:
-                    print('Completed round:', count)
-                    print('Result:', result)
-                    print('-'*40)
+
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
+        if DEBUG:
+            print(f'key is {"".join(key)}')
+            print(f'Length is {len(key)} bytes')
+            print(f'Key schedule is {self.key_schedule}')
+            print(f'{len(self.key_schedule)} subkeys')
+
 
     def key_expansion_192(self, seed):
         """
@@ -94,16 +97,43 @@ class KeySchedule:
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
         if DEBUG:
-            print(f'key is {key}')
-            print(f'Length is {len(key)}')
+            print(f'key is {"".join(key)}')
+            print(f'Length is {len(key)} bytes')
+            print(f'Key schedule is {self.key_schedule}')
+            print(f'{len(self.key_schedule)} subkeys')
+
 
     def key_expansion_256(self, seed):
         """
         256 byte expansion is a special case
-        :param seed:
-        :return:
+        :param seed: array of hex digits [A2, 5D, E4...]
         """
-        return None
+        key = seed
+        count = 0
+        while len(key) < 240:
+            for i in range(8):
+                key_len = len(key)
+                temp1 = key[key_len-4:key_len]  # last 4 bytes
+                if i == 0:
+                    temp1 = key_expansion_core(temp1, count)
+                    count += 1
+                if i == 4:
+                    temp1 = [SBOX[hexstr_to_int(x)] for x in temp1]
+                temp2 = key[key_len-32:key_len]  # temp2 (last 32 bytes)
+                temp2 = temp2[0:4]  # first 4 of last 32 bytes
+                result = []
+                for j in range(4):
+                    result.append(get_XOR(temp1[j], temp2[j]))
+                key += result
+
+        self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
+        self.key_schedule = [''.join(key) for key in self.key_schedule]
+        self.key = key
+        if DEBUG:
+            print(f'key is {"".join(key)}')
+            print(f'Length is {len(key)} bytes')
+            print(f'Key schedule is {self.key_schedule}')
+            print(f'{len(self.key_schedule)} subkeys')
 
     def is_final_round(self):
         return self.rounds == self.curr_round
@@ -187,7 +217,15 @@ def int_to_hexstr(number):
     return result
 
 
-def sub_bytes(bytes):
+def sub_bytes(bytes, inverse=False):
     if type(bytes) is str:
         bytes = wrap(bytes, 2)
-    return ''.join([SBOX[hexstr_to_int(b)] for b in bytes])
+
+    if inverse:
+        result = [SBOX.index(hexstr_to_int(b)) for b in bytes]
+        result = [int_to_hexstr(h) for h in result]
+    else:
+        result = [SBOX[hexstr_to_int(b)] for b in bytes]
+
+    return ''.join(result)
+
