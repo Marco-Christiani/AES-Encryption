@@ -72,3 +72,10 @@ def encrypt(seed,
         print(result)
         print('Encrypted Message:', ctext_result)
     return ctext_result
+
+
+def decrypt(seed,
+            plaintext,
+            block_mode: BlockMode = BlockMode.ECB,
+            verbose=False):
+    return NotImplemented
