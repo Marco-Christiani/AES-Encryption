@@ -3,8 +3,8 @@ from textwrap import wrap
 from Key_Calculations import hexstr_to_int, int_to_hexstr
 
 POLYCONSTANT = 0b100011011
-MIX_ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
-
+ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
+ARR_INV = np.array([[14, 11, 13,  9], [9, 14, 11, 13], [13,  9, 14, 11], [11, 13,  9, 14]])
 
 class Matrix:
     def __init__(self, data: str):
@@ -21,7 +21,10 @@ class Matrix:
             self.matrix[i] = np.roll(row, -i)
             i += 1
 
-    def mix_columns(self):
+    def mix_columns(self, inverse=False):
+        MIX_ARR = ARR
+        if inverse:
+            MIX_ARR = ARR_INV
         matrix_as_num = np.zeros([4, 4])
         i = 0
         for row in self.matrix:
