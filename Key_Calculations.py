@@ -67,7 +67,7 @@ class KeySchedule:
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
         if self.decrypt:
-            self.key_schedule = reversed(self.key_schedule)
+            self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
@@ -100,7 +100,7 @@ class KeySchedule:
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
         if self.decrypt:
-            self.key_schedule = reversed(self.key_schedule)
+            self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
@@ -135,7 +135,7 @@ class KeySchedule:
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
         if self.decrypt:
-            self.key_schedule = reversed(self.key_schedule)
+            self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
@@ -230,7 +230,7 @@ def sub_bytes(bytes, inverse=False):
         bytes = wrap(bytes, 2)
 
     if inverse:
-        result = [SBOX.index(hexstr_to_int(b)) for b in bytes]
+        result = [SBOX.index(b.upper()) for b in bytes]
         result = [int_to_hexstr(h) for h in result]
     else:
         result = [SBOX[hexstr_to_int(b)] for b in bytes]
