@@ -21,10 +21,11 @@ SBOX = ['63', '7C', '77', '7B', 'F2', '6B', '6F', 'C5', '30', '01', '67', '2B', 
 
 
 class KeySchedule:
-    def __init__(self, seed):
+    def __init__(self, seed, decrypt=False):
         self.key = []  # byte array as strings i.e. ['0a', '2f', ...]
         self.key_schedule = []  # expanded key broken into round keys
         self.curr_round = 0
+        self.decrypt = decrypt
         seed = wrap(seed, 2)
         seedlen = len(seed)
         if seedlen == 16:
@@ -65,12 +66,14 @@ class KeySchedule:
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
+        if self.decrypt:
+            self.key_schedule = reversed(self.key_schedule)
+            self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')
             print(f'Key schedule is {self.key_schedule}')
             print(f'{len(self.key_schedule)} subkeys')
-
 
     def key_expansion_192(self, seed):
         """
@@ -96,12 +99,14 @@ class KeySchedule:
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
+        if self.decrypt:
+            self.key_schedule = reversed(self.key_schedule)
+            self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')
             print(f'Key schedule is {self.key_schedule}')
             print(f'{len(self.key_schedule)} subkeys')
-
 
     def key_expansion_256(self, seed):
         """
@@ -129,6 +134,9 @@ class KeySchedule:
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
         self.key = key
+        if self.decrypt:
+            self.key_schedule = reversed(self.key_schedule)
+            self.key = ''.join(self.key_schedule)
         if DEBUG:
             print(f'key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')

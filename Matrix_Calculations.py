@@ -6,6 +6,7 @@ POLYCONSTANT = 0b100011011
 ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
 ARR_INV = np.array([[14, 11, 13,  9], [9, 14, 11, 13], [13,  9, 14, 11], [11, 13,  9, 14]])
 
+
 class Matrix:
     def __init__(self, data: str):
         self.matrix = np.empty([4, 4], dtype='U2')
