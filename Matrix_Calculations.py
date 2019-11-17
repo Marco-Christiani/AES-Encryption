@@ -16,10 +16,13 @@ class Matrix:
             self.matrix[i % 4][i // 4] = byte
             i += 1
 
-    def shift_rows(self):
+    def shift_rows(self, inverse=False):
         i = 0
         for row in self.matrix:
-            self.matrix[i] = np.roll(row, -i)
+            if inverse:
+                self.matrix[i] = np.roll(row, i)
+            else:
+                self.matrix[i] = np.roll(row, -i)
             i += 1
 
     def mix_columns(self, inverse=False):
@@ -70,14 +73,21 @@ class Matrix:
 def mult(a, b):
     a = int(a)
     b = int(b)
+
     if b == 1:
         return a
     if b == 2:
         return a << 1
     if b == 3:
         return (a << 1) ^ a
-    else:
-        raise Exception
+    if b == 9:
+        return (a << 3) ^ a
+    if b == 11:
+        return ((a << 2) ^ a) << 1
+    if b == 13:
+        return (((a << 1) ^ a) << 2) ^ a
+    if b == 14:
+        return ((((a << 1) ^ a) << 1) ^ a) << 1
 
 
 def mod_p(number):

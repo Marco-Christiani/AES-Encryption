@@ -85,3 +85,10 @@ class TestMain(TestCase):
     # def test_padding(self):
     #     # ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48'
     #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
+
+    def test_mix_cols(self):
+        mat = Matrix('A01478BE92570366F1D13C098726DAC5')
+        print(mat)
+        mat.mix_columns()
+        mat.mix_columns(inverse=True)
+        print(mat)
