@@ -115,7 +115,7 @@ def mult(a, b):
         result = mod_p(a << 3) ^ mod_p((a << 1) ^ a)  # a*8 + a*3
     elif b == 13:
         # result = (((a << 1) ^ a) << 2) ^ a
-        result = (a << 3) ^ ((a << 1) ^ a) ^ (a << 1)  # a*8 + a*3 +a*2
+        result = mod_p(a << 3) ^ mod_p((a << 1) ^ a) ^ (a << 1)  # a*8 + a*3 +a*2
     elif b == 14:
         # result = ((((a << 1) ^ a) << 1) ^ a) << 1
         result = (a << 3) ^ ((a << 1) ^ a) ^ ((a << 1) ^ a)  # a*8 + a*3 +a*3
