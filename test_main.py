@@ -87,13 +87,13 @@ class TestMain(TestCase):
     #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
 
     def test_mix_cols(self):
-        # mat = Matrix('A01478BE92570366F1D13C098726DAC5'.lower())
-        mat = Matrix('db135345f20a225c01010101c6c6c6c6')
+        mat = Matrix('126cf9a4000000000000000000000000')
+        # mat = Matrix('db135345f20a225c01010101c6c6c6c6')
         print(mat)
         print('-'*20)
-        mat.mix_columns()
-        print(mat)
-        print()
+        # mat.mix_columns()
+        # print(mat)
+        # print()
         mat.mix_columns(inverse=True)
         # mat.inv_mix_columns()
         print(mat)

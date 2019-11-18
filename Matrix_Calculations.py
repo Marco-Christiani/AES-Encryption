@@ -47,6 +47,8 @@ class Matrix:
                     temp_mat[k, j] = mult(elem,
                                           MIX_ARR[k, j])  # ^ POLYCONSTANT
 
+
+            print(temp_mat)
             # Add columns of temp_mat together
             result_vec = np.zeros(4)
             result_vec_str = np.empty(4, dtype='U2')  # column of final matrix
@@ -67,7 +69,6 @@ class Matrix:
         for row in self.matrix:
             matrix_as_num[i, :] = [hexstr_to_int(x) for x in row]
             i += 1
-        print('matrix_as_num:', matrix_as_num)
         # Multiply each column of matrix with mix columns matrix
         result = np.zeros([4, 4])
         for i in range(4):
@@ -85,7 +86,7 @@ class Matrix:
             self.matrix[1, i] = int_to_hexstr(int(result[1, i]))
             self.matrix[2, i] = int_to_hexstr(int(result[2, i]))
             self.matrix[3, i] = int_to_hexstr(int(result[3, i]))
-        print(result)
+            print(result)
 
     def flatten_cols(self):
         return ''.join(self.matrix.flatten())
@@ -110,17 +111,18 @@ def mult(a, b):
     elif b == 9:
         result = (a << 3) ^ a
     elif b == 11:
-        result = ((a << 2) ^ a) << 1
-        # result = (a << 3) ^ ((a << 1) ^ a)  # a*8 + a*3
+        # result = ((a << 2) ^ a) << 1
+        result = mod_p(a << 3) ^ mod_p((a << 1) ^ a)  # a*8 + a*3
     elif b == 13:
-        result = (((a << 1) ^ a) << 2) ^ a
-        # result = (a << 3) ^ ((a << 1) ^ a) ^ (a << 1)  # a*8 + a*3 +a*2
+        # result = (((a << 1) ^ a) << 2) ^ a
+        result = (a << 3) ^ ((a << 1) ^ a) ^ (a << 1)  # a*8 + a*3 +a*2
     elif b == 14:
-        result = ((((a << 1) ^ a) << 1) ^ a) << 1
-        # result = (a << 3) ^ ((a << 1) ^ a) ^ ((a << 1) ^ a)  # a*8 + a*3 +a*3
+        # result = ((((a << 1) ^ a) << 1) ^ a) << 1
+        result = (a << 3) ^ ((a << 1) ^ a) ^ ((a << 1) ^ a)  # a*8 + a*3 +a*3
     else:
         return Exception
-    return mod_p(result)
+    # return mod_p(result)
+    return result
 
 
 def mod_p(number):
