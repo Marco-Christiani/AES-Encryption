@@ -55,8 +55,8 @@ def encrypt(seed,
                 table.add_row(['', f'Add Round Key', ctext])
                 break
             mat.mix_columns()  # Mix Columns
-            table.add_row(['', 'Mix Columns', mat.flatten_cols()])
-            ctext = mat.flatten_cols()
+            table.add_row(['', 'Mix Columns', mat.flatten_rows()])
+            ctext = mat.flatten_rows()
 
             table.add_row(['', '', ''])
         if verbose:

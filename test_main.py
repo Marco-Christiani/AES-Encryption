@@ -95,4 +95,5 @@ class TestMain(TestCase):
         print(mat)
         print()
         mat.mix_columns(inverse=True)
+        # mat.inv_mix_columns()
         print(mat)

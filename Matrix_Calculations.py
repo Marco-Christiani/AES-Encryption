@@ -4,7 +4,8 @@ from Key_Calculations import hexstr_to_int, int_to_hexstr
 
 POLYCONSTANT = 0b100011011
 ARR = np.array([[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]])
-ARR_INV = np.array([[14, 11, 13,  9], [9, 14, 11, 13], [13,  9, 14, 11], [11, 13,  9, 14]])
+ARR_INV = np.array([[14, 11, 13, 9], [9, 14, 11, 13], [13, 9, 14, 11],
+                    [11, 13, 9, 14]])
 
 
 class Matrix:
@@ -52,13 +53,39 @@ class Matrix:
             for p in range(4):
                 row = temp_mat[p, :]
                 for elem in row:
-                    result_vec[p] = int(elem) ^ int(
-                        result_vec[p]
-                    )  # ^ POLYCONSTANT  # sum all elements in row
+                    result_vec[p] = int(elem) ^ int(result_vec[p])  # sum all elements in row
                 temp = mod_p(result_vec[p])
-                result_vec_str[p] = int_to_hexstr(
-                    temp)  # Convert to hex without 0x
-            self.matrix[i, :] = result_vec_str
+                result_vec_str[p] = int_to_hexstr(temp)  # Convert to hex without 0x
+            # print('Before mod:', result_vec)
+            # print('After mod:', [mod_p(x) for x in result_vec])
+            # self.matrix[i, :] = result_vec_str
+            self.matrix[:, i] = result_vec_str
+
+    def inv_mix_columns(self):
+        matrix_as_num = np.zeros([4, 4])
+        i = 0
+        for row in self.matrix:
+            matrix_as_num[i, :] = [hexstr_to_int(x) for x in row]
+            i += 1
+        print('matrix_as_num:', matrix_as_num)
+        # Multiply each column of matrix with mix columns matrix
+        result = np.zeros([4, 4])
+        for i in range(4):
+            col = matrix_as_num[:, i]
+            # Mix current col by multiplying by inverse mix array
+            result[0, i] = mult(col[0], ARR_INV[0, 0]) ^ mult(col[0], ARR_INV[0, 1]) \
+                           ^ mult(col[0], ARR_INV[0, 2]) ^ mult(col[0], ARR_INV[0, 3])
+            result[1, i] = mult(col[1], ARR_INV[1, 0]) ^ mult(col[1], ARR_INV[1, 1]) \
+                           ^ mult(col[1], ARR_INV[1, 2]) ^ mult(col[1], ARR_INV[1, 3])
+            result[2, i] = mult(col[2], ARR_INV[2, 0]) ^ mult(col[2], ARR_INV[2, 1]) \
+                           ^ mult(col[2], ARR_INV[2, 2]) ^ mult(col[2], ARR_INV[2, 3])
+            result[3, i] = mult(col[3], ARR_INV[3, 0]) ^ mult(col[3], ARR_INV[3, 1]) \
+                           ^ mult(col[3], ARR_INV[3, 2]) ^ mult(col[3], ARR_INV[3, 3])
+            self.matrix[0, i] = int_to_hexstr(int(result[0, i]))
+            self.matrix[1, i] = int_to_hexstr(int(result[1, i]))
+            self.matrix[2, i] = int_to_hexstr(int(result[2, i]))
+            self.matrix[3, i] = int_to_hexstr(int(result[3, i]))
+        print(result)
 
     def flatten_cols(self):
         return ''.join(self.matrix.flatten())
@@ -84,10 +111,13 @@ def mult(a, b):
         result = (a << 3) ^ a
     elif b == 11:
         result = ((a << 2) ^ a) << 1
+        # result = (a << 3) ^ ((a << 1) ^ a)  # a*8 + a*3
     elif b == 13:
         result = (((a << 1) ^ a) << 2) ^ a
+        # result = (a << 3) ^ ((a << 1) ^ a) ^ (a << 1)  # a*8 + a*3 +a*2
     elif b == 14:
         result = ((((a << 1) ^ a) << 1) ^ a) << 1
+        # result = (a << 3) ^ ((a << 1) ^ a) ^ ((a << 1) ^ a)  # a*8 + a*3 +a*3
     else:
         return Exception
     return mod_p(result)
