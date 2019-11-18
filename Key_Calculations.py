@@ -155,6 +155,9 @@ class KeySchedule:
         self.curr_round += 1
         return result
 
+    def get_keyschedule(self):
+        return self.key_schedule
+
     def get_num_rounds(self):
         return self.rounds
 

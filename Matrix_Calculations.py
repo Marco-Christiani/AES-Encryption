@@ -67,7 +67,7 @@ class Matrix:
         return ''.join(self.matrix.flatten(order='F'))
 
     def __str__(self):
-        return ''.join(self.matrix.flatten(order='F'))
+        return np.array2string(self.matrix)
 
 
 def mult(a, b):
@@ -75,19 +75,22 @@ def mult(a, b):
     b = int(b)
 
     if b == 1:
-        return a
-    if b == 2:
-        return a << 1
-    if b == 3:
-        return (a << 1) ^ a
-    if b == 9:
-        return (a << 3) ^ a
-    if b == 11:
-        return ((a << 2) ^ a) << 1
-    if b == 13:
-        return (((a << 1) ^ a) << 2) ^ a
-    if b == 14:
-        return ((((a << 1) ^ a) << 1) ^ a) << 1
+        result = a
+    elif b == 2:
+        result = a << 1
+    elif b == 3:
+        result = (a << 1) ^ a
+    elif b == 9:
+        result = (a << 3) ^ a
+    elif b == 11:
+        result = ((a << 2) ^ a) << 1
+    elif b == 13:
+        result = (((a << 1) ^ a) << 2) ^ a
+    elif b == 14:
+        result = ((((a << 1) ^ a) << 1) ^ a) << 1
+    else:
+        return Exception
+    return mod_p(result)
 
 
 def mod_p(number):
