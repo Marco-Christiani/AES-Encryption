@@ -87,6 +87,8 @@ class TestMain(TestCase):
     #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
 
     def test_mix_cols(self):
+        # 126cf9a496cfd3377068ddf3f83d2f64
+        # 126cf9a4000000000000000000000000
         mat = Matrix('126cf9a4000000000000000000000000')
         # mat = Matrix('db135345f20a225c01010101c6c6c6c6')
         print(mat)
