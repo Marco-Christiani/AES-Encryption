@@ -168,10 +168,10 @@ def decrypt(seed,
 
             mat = Matrix(ptext)  # Convert to 4x4 byte matrix
             mat.shift_rows(inverse=True)  # Inverse shift rows
-            table.add_row(['', 'Shift Rows', mat.flatten_rows()])
+            table.add_row(['', 'Inv Shift Rows', mat.flatten_rows()])
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
-            table.add_row(['', 'Sub Bytes', ptext])
+            table.add_row(['', 'Inv Sub Bytes', ptext])
 
             roundkey = key_sch.get_next_key()
             ptext = add_round_key(roundkey, ptext)  # Add round key
@@ -180,7 +180,7 @@ def decrypt(seed,
                 break  # No mix columns on last round
 
             mat.mix_columns(inverse=True)  # Inverse Mix Columns
-            table.add_row(['', 'Mix Columns', mat.flatten_cols()])
+            table.add_row(['', 'Inv Mix Columns', mat.flatten_cols()])
             ptext = mat.flatten_cols()
 
             table.add_row(['', '', ''])
