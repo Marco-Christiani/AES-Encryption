@@ -46,7 +46,6 @@ class Matrix:
                 for k in range(4):
                     temp_mat[k, j] = mult(elem,
                                           MIX_ARR[k, j])  # ^ POLYCONSTANT
-
             # Add columns of temp_mat together
             result_vec = np.zeros(4)
             result_vec_str = np.empty(4, dtype='U2')  # column of final matrix
