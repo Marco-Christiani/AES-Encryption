@@ -57,7 +57,6 @@ class TestMain(TestCase):
                          verbose=VERBOSE)
         self.assertEqual(ctext, result)
 
-
     def test_case_8(self):
         ptext = '0862760c67a0cdc3ede779b9eca00837d5f054da8afb588bce1033373dd9154868ffe11c4338a28a914a834c43d781addad9ac8a40a3aa9a8ff4a9ca71b87627ad840e86dfc33b28d06d6eca440d345986885afc85207c8acf6b0b797ea8a4fc4979eaacb43f8081a907856765b6151d065a1d96e0121ff46107240b1d89199a'
         seed = 'a5495495d0b61741fa674a77fd7ac231e8d10b6819db40e1'
@@ -80,6 +79,7 @@ class TestMain(TestCase):
                 '2039b1fc7223e7f438e7ba354e19'
 
         result = decrypt(self.seed128, ctext, verbose=VERBOSE)
+        # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
         self.assertEqual(self.ptext, result)
     #
     # def test_padding(self):
@@ -87,9 +87,9 @@ class TestMain(TestCase):
     #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
 
     def test_mix_cols(self):
-        # 126cf9a496cfd3377068ddf3f83d2f64
-        # 126cf9a4000000000000000000000000
-        mat = Matrix('12bcf9a4000000000000000000000000')
+        # 12bcf9a496cfd3377068ddf3f83d2f64
+        # 12bcf9a4000000000000000000000000
+        mat = Matrix('12bcf9a49bcfd3377068ddf3f83d2fb4')
         # mat = Matrix('db135345f20a225c01010101c6c6c6c6')
         print(mat)
         print('-'*20)

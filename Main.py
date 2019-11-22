@@ -75,15 +75,17 @@ def encrypt(seed,
     return ctext_result
 
 
-def decrypt_backup(seed,
+def decrypt(seed,
             ciphertext,
             block_mode: BlockMode = BlockMode.ECB,
             verbose=False):
     result = PrettyTable(field_names=None)
     table = PrettyTable()
 
-    key_sch = KeySchedule(seed, decrypt=True)  # go through keys backwards
-    block_stream = BlockStream(ciphertext.lower(), decrypt=True)  # go through blocks backwards
+    # key_sch = KeySchedule(seed, decrypt=True)  FIXME # go through keys backwards
+    key_sch = KeySchedule(seed)
+    # block_stream = BlockStream(ciphertext.lower(), decrypt=True)  FIXME # go through blocks backwards
+    block_stream = BlockStream(ciphertext.lower())
     ptext_result = []
 
     while not block_stream.is_empty():
@@ -108,21 +110,25 @@ def decrypt_backup(seed,
 
             mat = Matrix(ptext)  # Convert to 4x4 byte matrix
             mat.shift_rows(inverse=True)  # Inverse shift rows
-            table.add_row(['', 'Shift Rows', mat.flatten_rows()])
+            table.add_row(['', 'Inv Shift Rows', mat.flatten_rows()])
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
-            table.add_row(['', 'Sub Bytes', ptext])
+            table.add_row(['', 'Inv Sub Bytes', ptext])
 
-            if round_num == 0:
-                continue  # First round, no mix columns
+            if key_sch.is_final_round():
+                final_key = key_sch.get_next_key()
+                ptext = mat.flatten_rows()
+                ptext = add_round_key(final_key, ptext)  # Add final round key
+                table.add_row(['', f'Add Round Key', ptext])
+                break
+
             mat.mix_columns(inverse=True)  # Mix Columns
-            table.add_row(['', 'Mix Columns', mat.flatten_cols()])
+            table.add_row(['', 'Inv Mix Columns', mat.flatten_cols()])
             ptext = mat.flatten_cols()
 
             table.add_row(['', '', ''])
         if verbose:
-            result.add_row(
-                [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
+            result.add_row( [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
             result.header = False
             result.vrules = 0
             print(table)
@@ -135,7 +141,8 @@ def decrypt_backup(seed,
         print('Decrypted Message:', ptext_result)
     return ctext_result
 
-def decrypt(seed,
+
+def decrypt_backup(seed,
             ciphertext,
             block_mode: BlockMode = BlockMode.ECB,
             verbose=False):
