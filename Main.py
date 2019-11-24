@@ -25,7 +25,8 @@ def encrypt(seed,
         temp = block_stream.get_next_block()
         if (block_mode is BlockMode.CBC) \
                 and (block_stream.get_block_num() != 1):
-            temp = add_round_key(temp, ctext)  # XOR w/ previous ciphered block (reuse method)
+            temp = add_round_key(
+                temp, ctext)  # XOR w/ previous ciphered block (reuse method)
         ctext = temp
 
         # Create Table for new block
@@ -93,7 +94,8 @@ def decrypt(seed,
         temp = block_stream.get_next_block()
         if (block_mode is BlockMode.CBC) \
                 and (block_stream.get_block_num() != 1):
-            temp = add_round_key(temp, ptext)  # XOR w/ previous decrypted block (reuse method)
+            temp = add_round_key(
+                temp, ptext)  # XOR w/ previous decrypted block (reuse method)
         ptext = temp
 
         # Create Table for new block
@@ -129,7 +131,8 @@ def decrypt(seed,
                 break
 
         if verbose:
-            result.add_row( [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
+            result.add_row(
+                [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
             result.header = False
             result.vrules = 0
             print(table)
@@ -144,9 +147,9 @@ def decrypt(seed,
 
 
 def decrypt_backup(seed,
-            ciphertext,
-            block_mode: BlockMode = BlockMode.ECB,
-            verbose=False):
+                   ciphertext,
+                   block_mode: BlockMode = BlockMode.ECB,
+                   verbose=False):
     result = PrettyTable(field_names=None)
     table = PrettyTable()
 
@@ -159,7 +162,8 @@ def decrypt_backup(seed,
         temp = block_stream.get_next_block()
         if (block_mode is BlockMode.CBC) \
                 and (block_stream.get_block_num() != 1):
-            temp = add_round_key(temp, ptext)  # XOR w/ previous decrypted block (reuse method)
+            temp = add_round_key(
+                temp, ptext)  # XOR w/ previous decrypted block (reuse method)
         ptext = temp
 
         # Create Table for new block

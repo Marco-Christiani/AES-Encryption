@@ -63,15 +63,10 @@ class TestMain(TestCase):
         ctext_ecb = '1c47ecadaef89648085cdb40949f5fc947774da8a3ee4f881f5164dfb04541de3b8be0b2aa155b15f71f0a9ccec1f7167c8e5866968c22fa19c658da98f4f73bb9f136a63e7b7085cd86e8ccbe15cb7e48ba3f7491c67ac65744e4264bd659c41aedf3a1f5deb9f07557d69ea7df74c31b61731443cf0b89df41b454720195e8'
         ctext_cbc = '1c47ecadaef89648085cdb40949f5fc9011eadff1d9dbefea1ca6c82c93640040614d2a84e512c4a213ec5b6c7d29834c0762a0daa22298e3cb062828f155f8b7d4678f4bac3e3688ee420b486fbaa1cda87ac811c62e4ad1613222c6ada8ddc861a6f10faaecc3f14cd8271dd66ddb220ac0fda50f47050cac22bd829df6d0d'
 
-        result = encrypt(seed,
-                         ptext,
-                         verbose=VERBOSE)
+        result = encrypt(seed, ptext, verbose=VERBOSE)
         self.assertEqual(ctext_ecb, result)
 
-        result = encrypt(seed,
-                         ptext,
-                         BlockMode.CBC,
-                         verbose=VERBOSE)
+        result = encrypt(seed, ptext, BlockMode.CBC, verbose=VERBOSE)
         self.assertEqual(ctext_cbc, result)
 
     def test_decrypt_128_ecb(self):
@@ -81,6 +76,7 @@ class TestMain(TestCase):
         result = decrypt(self.seed128, ctext, verbose=VERBOSE)
         # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
         self.assertEqual(self.ptext, result)
+
     #
     # def test_padding(self):
     #     # ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48'
@@ -92,7 +88,7 @@ class TestMain(TestCase):
         mat = Matrix('12bcf9a49bcfd3377068ddf3f83d2fb4')
         # mat = Matrix('db135345f20a225c01010101c6c6c6c6')
         print(mat)
-        print('-'*20)
+        print('-' * 20)
         # mat.mix_columns()
         # print(mat)
         # print(mat)mu
@@ -117,4 +113,5 @@ class TestMain(TestCase):
         key_sch = KeySchedule(self.seed128, decrypt=False)
         print(key_sch.get_keyschedule())
         key_sch = KeySchedule(self.seed128, decrypt=True)
-        for i in key_sch.get_keyschedule(): print(i)
+        for i in key_sch.get_keyschedule():
+            print(i)
