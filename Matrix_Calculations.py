@@ -52,9 +52,11 @@ class Matrix:
             for p in range(4):
                 row = temp_mat[p, :]
                 for elem in row:
-                    result_vec[p] = int(elem) ^ int(result_vec[p])  # sum all elements in row
+                    result_vec[p] = int(elem) ^ int(
+                        result_vec[p])  # sum all elements in row
                 temp = mod_p(result_vec[p])
-                result_vec_str[p] = int_to_hexstr(temp)  # Convert to hex without 0x
+                result_vec_str[p] = int_to_hexstr(
+                    temp)  # Convert to hex without 0x
             # print('Before mod:', result_vec)
             # print('After mod:', [mod_p(x) for x in result_vec])
             # self.matrix[i, :] = result_vec_str
