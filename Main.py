@@ -82,9 +82,9 @@ def decrypt(seed,
     result = PrettyTable(field_names=None)
     table = PrettyTable()
 
-    key_sch = KeySchedule(seed, decrypt=True)   # FIXME go through keys backwards
+    key_sch = KeySchedule(seed, decrypt=True)
     # key_sch = KeySchedule(seed)
-    # block_stream = BlockStream(ciphertext.lower(), decrypt=True)  FIXME # go through blocks backwards
+    # block_stream = BlockStream(ciphertext.lower(), decrypt=True)
     block_stream = BlockStream(ciphertext.lower())
     ptext_result = []
 
@@ -101,31 +101,33 @@ def decrypt(seed,
         table.align['Operation'] = 'l'
         table.add_row(['', 'Current Block', ptext])
 
-        first_key = key_sch.get_next_key()
-        ptext = add_round_key(first_key, ptext)  # Add first round key
-        table.add_row(['', f'Add Round Key', ptext])
-
         # Decrypt block -------------------------------------------------------
         for round_num in range(key_sch.get_num_rounds()):
+            roundkey = key_sch.get_next_key()
+            ptext = add_round_key(roundkey, ptext)  # Add  round key
+            table.add_row([round_num, f'Add Round Key', ptext])
 
             mat = Matrix(ptext)  # Convert to 4x4 byte matrix
 
             if round_num > 0:
                 mat.mix_columns(inverse=True)  # Mix Columns
-                table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
+                table.add_row(['', 'Inv Mix Columns', mat.flatten_cols()])
                 ptext = mat.flatten_cols()
 
             mat.shift_rows(inverse=True)  # Inverse shift rows
-            table.add_row(['', 'Inv Shift Rows', mat.flatten_rows()])
+            table.add_row(['', 'Inv Shift Rows', mat.flatten_cols()])
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
             table.add_row(['', 'Inv Sub Bytes', ptext])
 
-            roundkey = key_sch.get_next_key()
-            ptext = add_round_key(roundkey, ptext)  # Add round key
-            table.add_row([round_num, f'Add Round Key', ptext])
-
             table.add_row(['', '', ''])
+            if key_sch.is_final_round():
+                final_key = key_sch.get_next_key()
+                ptext = mat.flatten_cols()
+                ptext = add_round_key(final_key, ptext)  # Add final round key
+                table.add_row(['', f'Add Round Key', ptext])
+                break
+
         if verbose:
             result.add_row( [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
             result.header = False

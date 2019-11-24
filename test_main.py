@@ -114,3 +114,7 @@ class TestMain(TestCase):
         print(temp)
         print(temp2)
         self.assertEqual(temp, temp2)
+        key_sch = KeySchedule(self.seed128, decrypt=False)
+        print(key_sch.get_keyschedule())
+        key_sch = KeySchedule(self.seed128, decrypt=True)
+        for i in key_sch.get_keyschedule(): print(i)
