@@ -77,10 +77,7 @@ class TestMain(TestCase):
         # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
         self.assertEqual(self.ptext, result)
 
-    #
-    # def test_padding(self):
-    #     # ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48'
-    #     # ptext = 'A01478BE92570366F1D13C098726DAC53722ddf33b549fb4d84da20855ed45bc'
+    #  TODO implement padding
 
     def test_mix_cols(self):
         # 12bcf9a496cfd3377068ddf3f83d2f64
