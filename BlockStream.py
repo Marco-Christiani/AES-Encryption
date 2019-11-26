@@ -16,7 +16,7 @@ class BlockStream:
             for i in range(0, len(bytes), self.blocksize)
         ]
         self.blockstream = full_blocks
-
+        # ---------------------- Padding ----------------------------
         partial_block_size = len(bytes) % self.blocksize
         partial_block_start = len(bytes) - partial_block_size
         if partial_block_size > 0:
@@ -28,6 +28,7 @@ class BlockStream:
                 padded_block.append(0)
             padded_block += partial_block
             self.blockstream = full_blocks + padded_block
+        # -----------------------------------------------------------
         if decrypt:
             self.blockstream = list(reversed(self.blockstream))
 
