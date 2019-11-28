@@ -57,9 +57,6 @@ class Matrix:
                 temp = mod_p(result_vec[p])
                 result_vec_str[p] = int_to_hexstr(
                     temp)  # Convert to hex without 0x
-            # print('Before mod:', result_vec)
-            # print('After mod:', [mod_p(x) for x in result_vec])
-            # self.matrix[i, :] = result_vec_str
             self.matrix[:, i] = result_vec_str
 
     def flatten_cols(self):
