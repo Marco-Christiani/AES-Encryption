@@ -86,7 +86,7 @@ def mult(a, b):
     elif b == 13:
         result = (a << 3) ^ (a << 2) ^ a  # a*8 + a*4 +a*1
     elif b == 14:
-        result = (a << 3) ^ (a << 2) ^ (a << 1)  # a*8 + a*4 +a*2
+        result = (a << 3) ^ (a << 2) ^ (a << 1)  
     else:
         return Exception
     return mod_p(result)
