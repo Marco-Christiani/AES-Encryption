@@ -181,7 +181,6 @@ def key_expansion_core(key, i):
     """
     key = np.roll(key, -1)  # rotate_left
     # key = [SBOX[ hexstr_to_int(c) ] for c in key] # s_box
-    # print(key)
     key = sub_bytes(key)
     key = wrap(key, 2)
 
