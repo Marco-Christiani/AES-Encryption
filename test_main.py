@@ -88,7 +88,7 @@ class TestMain(TestCase):
         print('-' * 20)
         # mat.mix_columns()
         # print(mat)
-        # print(mat)mu
+        # print(mat)
         # print()
         mat.mix_columns(inverse=True)
         # mat.inv_mix_columns()
