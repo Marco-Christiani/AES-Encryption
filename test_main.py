@@ -1,5 +1,8 @@
 from unittest import TestCase
 from Main import *
+from PIL import Image
+import matplotlib.pyplot as plt
+
 
 VERBOSE = False
 
@@ -84,5 +87,24 @@ class TestMain(TestCase):
         self.assertEqual(self.ptext.lower(), result.lower())
 
     #  TODO implement padding
+
+    def test_img(self):
+        img_bytes='89504e470d0a1a0a0000000d4948445257e9fed303dfcd891e80b4fceaaf26828f181937201884c78d20718f21a0f9c5ea9b' \
+                  '96172549243e75fa5964182f220df7c0d250f6656edd0d7db0863da51ca678532d9a63f6385e2ca6864e94dc48d7'
+        img_bytes = wrap(img_bytes, 2)
+        img_bytes = [hexstr_to_int(b) for b in img_bytes]
+        img_length = len(img_bytes)
+        height = 12
+        width = 8
+        bytearr = np.array(img_bytes).astype(int)
+        bytearr = bytearr.reshape( (width, height) )
+
+        # bytearr.astype(np.uint8)
+
+        im = Image.fromarray(bytearr, mode='L')
+        # im.show()
+        plt.gray()
+        plt.imshow(im)
+        plt.show()
 
 
