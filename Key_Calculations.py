@@ -58,9 +58,9 @@ class KeySchedule:
         """
         key = seed
         count = 0
+        key_len = len(key)
         while len(key) < 176:
             for i in range(4):
-                key_len = len(key)
                 temp1 = key[key_len - 4:key_len]  # last 4 bytes
                 if i == 0:
                     temp1 = key_expansion_core(temp1, count)
@@ -71,6 +71,9 @@ class KeySchedule:
                 for j in range(4):
                     result.append(get_XOR(temp1[j], temp2[j]))
                 key += result
+                key_len = len(key)
+                if key_len >= 176:
+                    break
 
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
@@ -79,7 +82,8 @@ class KeySchedule:
             self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
-            print(f'key is {"".join(key)}')
+            print('Using 128 byte expansion...')
+            print(f'Key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')
             print(f'Key schedule is {self.key_schedule}')
             print(f'{len(self.key_schedule)} subkeys')
@@ -91,9 +95,9 @@ class KeySchedule:
         """
         key = seed
         count = 0
+        key_len = len(key)
         while len(key) < 208:
             for i in range(6):
-                key_len = len(key)
                 temp1 = key[key_len - 4:key_len]  # last 4 bytes
                 if i == 0:
                     temp1 = key_expansion_core(temp1, count)
@@ -104,6 +108,9 @@ class KeySchedule:
                 for j in range(4):
                     result.append(get_XOR(temp1[j], temp2[j]))
                 key += result
+                key_len = len(key)
+                if key_len >= 208:
+                    break
 
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
@@ -112,7 +119,8 @@ class KeySchedule:
             self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
-            print(f'key is {"".join(key)}')
+            print('Using 192 byte expansion...')
+            print(f'Key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')
             print(f'Key schedule is {self.key_schedule}')
             print(f'{len(self.key_schedule)} subkeys')
@@ -124,9 +132,9 @@ class KeySchedule:
         """
         key = seed
         count = 0
+        key_len = len(key)
         while len(key) < 240:
             for i in range(8):
-                key_len = len(key)
                 temp1 = key[key_len - 4:key_len]  # last 4 bytes
                 if i == 0:
                     temp1 = key_expansion_core(temp1, count)
@@ -139,6 +147,9 @@ class KeySchedule:
                 for j in range(4):
                     result.append(get_XOR(temp1[j], temp2[j]))
                 key += result
+                key_len = len(key)
+                if key_len >= 240:
+                    break
 
         self.key_schedule = [key[i:i + 16] for i in range(0, len(key), 16)]
         self.key_schedule = [''.join(key) for key in self.key_schedule]
@@ -147,7 +158,8 @@ class KeySchedule:
             self.key_schedule = list(reversed(self.key_schedule))
             self.key = ''.join(self.key_schedule)
         if DEBUG:
-            print(f'key is {"".join(key)}')
+            print('Using 256 byte expansion...')
+            print(f'Key is {"".join(key)}')
             print(f'Length is {len(key)} bytes')
             print(f'Key schedule is {self.key_schedule}')
             print(f'{len(self.key_schedule)} subkeys')
@@ -225,7 +237,6 @@ def add_round_key(key, text):
 
 
 def hexstr_to_int(hexstr):
-    print('hexstr:', hexstr)
     return int('0x' + hexstr, 0)
 
 
