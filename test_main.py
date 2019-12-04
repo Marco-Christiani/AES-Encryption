@@ -79,36 +79,4 @@ class TestMain(TestCase):
 
     #  TODO implement padding
 
-    def test_mix_cols(self):
-        # 12bcf9a496cfd3377068ddf3f83d2f64
-        # 12bcf9a4000000000000000000000000
-        mat = Matrix('12bcf9a49bcfd3377068ddf3f83d2fb4')
-        # mat = Matrix('db135345f20a225c01010101c6c6c6c6')
-        print(mat)
-        print('-' * 20)
-        # mat.mix_columns()
-        # print(mat)
-        # print(mat)
-        # print()
-        mat.mix_columns(inverse=True)
-        # mat.inv_mix_columns()
-        print(mat)
 
-        b = '12bcf9a49bcfd3377068ddf3f83d2fb4'
-        b1 = sub_bytes(b)
-        b2 = sub_bytes(b1, inverse=True)
-        self.assertEqual(b, b2)
-
-        m = Matrix(b)
-        temp = m.flatten_rows()
-        m.shift_rows()
-        m.shift_rows(inverse=True)
-        temp2 = m.flatten_rows()
-        print(temp)
-        print(temp2)
-        self.assertEqual(temp, temp2)
-        key_sch = KeySchedule(self.seed128, decrypt=False)
-        print(key_sch.get_keyschedule())
-        key_sch = KeySchedule(self.seed128, decrypt=True)
-        for i in key_sch.get_keyschedule():
-            print(i)
