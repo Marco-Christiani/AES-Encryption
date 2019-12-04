@@ -75,7 +75,7 @@ class TestMain(TestCase):
 
         result = decrypt(self.seed128, ctext, verbose=VERBOSE)
         # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
-        self.assertEqual(self.ptext, result)
+        self.assertEqual(self.ptext.lower(), result.lower())
 
     #  TODO implement padding
 
@@ -100,10 +100,10 @@ class TestMain(TestCase):
         self.assertEqual(b, b2)
 
         m = Matrix(b)
-        temp = m.flatten_cols()
+        temp = m.flatten_rows()
         m.shift_rows()
         m.shift_rows(inverse=True)
-        temp2 = m.flatten_cols()
+        temp2 = m.flatten_rows()
         print(temp)
         print(temp2)
         self.assertEqual(temp, temp2)

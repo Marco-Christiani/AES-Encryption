@@ -113,11 +113,12 @@ def decrypt(seed,
 
             if round_num > 0:
                 mat.mix_columns(inverse=True)  # Mix Columns
-                table.add_row(['', 'Inv Mix Columns', mat.flatten_cols()])
+                table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
                 ptext = mat.flatten_cols()
 
             mat.shift_rows(inverse=True)  # Inverse shift rows
-            table.add_row(['', 'Inv Shift Rows', mat.flatten_cols()])
+            ptext = mat.flatten_rows()
+            table.add_row(['', 'Inv Shift Rows', ptext])
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
             table.add_row(['', 'Inv Sub Bytes', ptext])
@@ -125,8 +126,7 @@ def decrypt(seed,
             table.add_row(['', '', ''])
             if key_sch.is_final_round():
                 final_key = key_sch.get_next_key()
-                ptext = mat.flatten_cols()
-                ptext = add_round_key(final_key, ptext)  # Add final round key
+                ptext = add_round_key(ptext, final_key)  # Add final round key
                 table.add_row(['', f'Add Round Key', ptext])
                 break
 
