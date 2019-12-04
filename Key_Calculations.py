@@ -229,6 +229,11 @@ def hexstr_to_int(hexstr):
 
 
 def int_to_hexstr(number):
+    """
+    Convert to hex without '0x'
+    :param number: number to convert
+    :return: hex representation as 2 character string
+    """
     result = hex(number).split('0x')[1]  # Convert to string without '0x'
     # Pad with zeros if necessary
     result = '0' * (2 - len(result)) + result
