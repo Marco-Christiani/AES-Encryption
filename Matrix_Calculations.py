@@ -33,6 +33,11 @@ class Matrix:
         matrix_as_num = np.zeros([4, 4])
         i = 0
         for row in self.matrix:
+            try:
+                [hexstr_to_int(x) for x in row]
+            except ValueError:
+                print(self.matrix)
+                exit()
             matrix_as_num[i, :] = [hexstr_to_int(x) for x in row]
             i += 1
 
@@ -86,7 +91,7 @@ def mult(a, b):
     elif b == 13:
         result = (a << 3) ^ (a << 2) ^ a  # a*8 + a*4 +a*1
     elif b == 14:
-        result = (a << 3) ^ (a << 2) ^ (a << 1)  
+        result = (a << 3) ^ (a << 2) ^ (a << 1)
     else:
         return Exception
     return mod_p(result)

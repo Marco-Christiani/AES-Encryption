@@ -225,6 +225,7 @@ def add_round_key(key, text):
 
 
 def hexstr_to_int(hexstr):
+    print('hexstr:', hexstr)
     return int('0x' + hexstr, 0)
 
 
