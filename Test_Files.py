@@ -51,7 +51,7 @@ def run_encrypt(fname_txt, fname_key, block_mode, _decrypt=False):
 
 
 if __name__ == '__main__':
-    # ptext_filename = 'aes-plaintext11.txt'
+    ptext_filename = 'aes-plaintext11.txt'
     # key_filename = 'aes-key11.txt'
     # mode = BlockMode.ECB
     # run_encrypt(ptext_filename, key_filename, mode)
