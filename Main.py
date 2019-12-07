@@ -76,8 +76,8 @@ def encrypt(seed,
         # End Encrypt Block --------------------------------------------------------------------------------------------
     ctext_result = ''.join(ctext_result)
     if verbose:
-        print(result)
-        print('Encrypted Message:', ctext_result)
+        log(result)
+        log('Encrypted Message:', ctext_result)
     return ctext_result
 
 
@@ -90,8 +90,6 @@ def decrypt(seed,
 
     key_sch = KeySchedule(seed, decrypt=True)
 
-    # key_sch = KeySchedule(seed)
-    # block_stream = BlockStream(ciphertext.lower(), decrypt=True)
     block_stream = BlockStream(ciphertext.lower())
     ptext_result = []
 
@@ -108,41 +106,41 @@ def decrypt(seed,
         table.field_names = ['Round', 'Operation', 'Byte String']
         table.align['Operation'] = 'l'
         table.add_row(['', 'Current Block', ptext])
-        log('Current Block', ptext)
+        log(f'Current Block {ptext}', debug=True)
 
         # Decrypt block ------------------------------------------------------------------------------------------------
         for round_num in range(key_sch.get_num_rounds()):
             roundkey = key_sch.get_next_key()
             ptext = add_round_key(roundkey, ptext)  # Add  round key
             table.add_row([round_num, f'Add Round Key', ptext])
-            log(round_num, f'Add Round Key', ptext)
+            log(f'{round_num} Add Round Key {ptext}', debug=True)
 
             mat = Matrix(ptext)  # Convert to 4x4 byte matrix
 
             if round_num > 0:
                 mat.mix_columns(inverse=True)  # Mix Columns
                 table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
-                log('Inv Mix Columns', mat.flatten_rows())
+                log(f'Inv Mix Columns {mat.flatten_rows()}', debug=True)
                 ptext = mat.flatten_cols()
 
             mat.shift_rows(inverse=True)  # Inverse shift rows
             ptext = mat.flatten_rows()
             table.add_row(['', 'Inv Shift Rows', ptext])
-            log('Inv Shift Rows', ptext)
+            log(f'Inv Shift Rows {ptext}', debug=True)
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
             table.add_row(['', 'Inv Sub Bytes', ptext])
-            log('Inv Sub Bytes', ptext)
+            log(f'Inv Sub Bytes {ptext}', debug=True)
 
             table.add_row(['', '', ''])
             if key_sch.is_final_round():
                 final_key = key_sch.get_next_key()
                 ptext = add_round_key(ptext, final_key)  # Add final round key
                 table.add_row(['', 'Add Round Key', ptext])
-                log('Add Round Key', ptext)
+                log(f'Add Round Key {ptext}')
                 break
 
-        log(f'Block {block_stream.get_block_num()} Plaintext:', ptext)
+        log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}')
 
         if verbose:
             result.add_row(
@@ -154,9 +152,6 @@ def decrypt(seed,
         key_sch.reset_roundkey_count()
         # End Decrypt Block --------------------------------------------------------------------------------------------
     ctext_result = ''.join(ptext_result)
-    if verbose:
-        log(result)
-        log('Decrypted Message:', ptext_result)
     return ctext_result
 
 
@@ -179,10 +174,16 @@ def read_file(path):
     return contents
 
 
-def log(msg, **kwargs):
+def log(msg, debug=False, **kwargs):
     color = kwargs.get('color', '')
     msg = color+msg
-    click.echo(msg)
+    if debug:  # if it is debugging output
+        if DEBUG:  # if global debugging output is enabled
+            click.echo(msg)
+        else:
+            return
+    else:
+        click.echo(msg)
 
 
 if __name__ == '__main__':
