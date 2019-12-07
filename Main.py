@@ -3,13 +3,18 @@ from Matrix_Calculations import *
 from BlockStream import *
 from prettytable import PrettyTable
 from enum import Enum
+from colorama import Fore, Style, init
+import click
 
 
 class BlockMode(Enum):
     ECB = 1
     CBC = 2
 
-
+@click.command()
+@click.option('--seed', default=1, help='Number of greetings.')
+@click.option('--input-file', prompt='Your name',
+              help='The person to greet.')
 def encrypt(seed,
             plaintext,
             block_mode: BlockMode = BlockMode.ECB,
@@ -35,7 +40,7 @@ def encrypt(seed,
         table.align['Operation'] = 'l'
         table.add_row(['', 'Current Block', ctext])
 
-        # Encrypt block -------------------------------------------------------
+        # Encrypt block ------------------------------------------------------------------------------------------------
         for round_num in range(key_sch.get_num_rounds()):
             roundkey = key_sch.get_next_key()
 
@@ -68,7 +73,7 @@ def encrypt(seed,
             print(table)
         ctext_result.append(''.join(ctext))
         key_sch.reset_roundkey_count()
-        # End Encrypt Block ----------------------------------------------------
+        # End Encrypt Block --------------------------------------------------------------------------------------------
     ctext_result = ''.join(ctext_result)
     if verbose:
         print(result)
@@ -103,54 +108,82 @@ def decrypt(seed,
         table.field_names = ['Round', 'Operation', 'Byte String']
         table.align['Operation'] = 'l'
         table.add_row(['', 'Current Block', ptext])
-        print('Current Block', ptext)
+        log('Current Block', ptext)
 
-        # Decrypt block -------------------------------------------------------
+        # Decrypt block ------------------------------------------------------------------------------------------------
         for round_num in range(key_sch.get_num_rounds()):
             roundkey = key_sch.get_next_key()
             ptext = add_round_key(roundkey, ptext)  # Add  round key
             table.add_row([round_num, f'Add Round Key', ptext])
-            print(round_num, f'Add Round Key', ptext)
+            log(round_num, f'Add Round Key', ptext)
 
             mat = Matrix(ptext)  # Convert to 4x4 byte matrix
 
             if round_num > 0:
                 mat.mix_columns(inverse=True)  # Mix Columns
                 table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
-                print('Inv Mix Columns', mat.flatten_rows())
+                log('Inv Mix Columns', mat.flatten_rows())
                 ptext = mat.flatten_cols()
 
             mat.shift_rows(inverse=True)  # Inverse shift rows
             ptext = mat.flatten_rows()
             table.add_row(['', 'Inv Shift Rows', ptext])
-            print('Inv Shift Rows', ptext)
+            log('Inv Shift Rows', ptext)
 
             ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
             table.add_row(['', 'Inv Sub Bytes', ptext])
-            print('Inv Sub Bytes', ptext)
+            log('Inv Sub Bytes', ptext)
 
             table.add_row(['', '', ''])
             if key_sch.is_final_round():
                 final_key = key_sch.get_next_key()
                 ptext = add_round_key(ptext, final_key)  # Add final round key
                 table.add_row(['', 'Add Round Key', ptext])
-                print('Add Round Key', ptext)
+                log('Add Round Key', ptext)
                 break
 
-        print(f'Block {block_stream.get_block_num()} Plaintext:', ptext)
+        log(f'Block {block_stream.get_block_num()} Plaintext:', ptext)
 
         if verbose:
             result.add_row(
                 [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
             result.header = False
             result.vrules = 0
-            print(table)
+            log(table)
         ptext_result.append(''.join(ptext))
         key_sch.reset_roundkey_count()
-        # End Decrypt Block ----------------------------------------------------
+        # End Decrypt Block --------------------------------------------------------------------------------------------
     ctext_result = ''.join(ptext_result)
     if verbose:
-        print(result)
-        print('Decrypted Message:', ptext_result)
+        log(result)
+        log('Decrypted Message:', ptext_result)
     return ctext_result
 
+
+#                                                  /------------------\
+# -------------------------------------------------| Helper Functions |-------------------------------------------------
+#                                                  \------------------/
+
+def read_file(path):
+    click.echo(f'Loading file {Fore.GREEN + path + Style.RESET_ALL}... ', nl=False, color=True)
+    f = open(path)
+    contents = f.readlines()
+    contents = ''.join(contents)
+    f.close()
+    if contents is not None:
+        click.echo('File loaded!')
+    else:
+        click.echo(Fore.RED + 'Read failed.' + Style.RESET_ALL)
+        click.echo('Process terminated.')
+        exit()
+    return contents
+
+
+def log(msg, **kwargs):
+    color = kwargs.get('color', '')
+    msg = color+msg
+    click.echo(msg)
+
+
+if __name__ == '__main__':
+    init(autoreset=True)
