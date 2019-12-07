@@ -11,153 +11,162 @@ class BlockMode(Enum):
     ECB = 1
     CBC = 2
 
-@click.command()
-@click.option('--seed', default=1, help='Number of greetings.')
-@click.option('--input-file', prompt='Your name',
-              help='The person to greet.')
-def encrypt(seed,
-            plaintext,
-            block_mode: BlockMode = BlockMode.ECB,
-            verbose=False):
-    result = PrettyTable(field_names=None)
+class AES():
+    def __init__(self, debug, verbose, block_mode: BlockMode = BlockMode.ECB):
+        self.debug = debug
+        self.verbose = verbose
+        self.block_mode = block_mode
 
-    key_sch = KeySchedule(seed)
-    block_stream = BlockStream(plaintext.lower())
-    ctext_result = []
+    def encrypt(self, seed, plaintext):
+        result = PrettyTable(field_names=None)
 
-    while not block_stream.is_empty():
-        # Get next plaintext block
-        temp = block_stream.get_next_block()
-        if (block_mode is BlockMode.CBC) \
-                and (block_stream.get_block_num() != 1):
-            temp = add_round_key(
-                temp, ctext)  # XOR w/ previous ciphered block (reuse method)
-        ctext = temp
+        key_sch = KeySchedule(seed)
+        block_stream = BlockStream(plaintext.lower())
+        ctext_result = []
 
-        # Create Table for new block
-        table = PrettyTable()
-        table.field_names = ['Round', 'Operation', 'Byte String']
-        table.align['Operation'] = 'l'
-        table.add_row(['', 'Current Block', ctext])
+        while not block_stream.is_empty():
+            # Get next plaintext block
+            temp = block_stream.get_next_block()
+            if (self.block_mode is BlockMode.CBC) \
+                    and (block_stream.get_block_num() != 1):
+                temp = add_round_key(
+                    temp, ctext)  # XOR w/ previous ciphered block (reuse method)
+            ctext = temp
 
-        # Encrypt block ------------------------------------------------------------------------------------------------
-        for round_num in range(key_sch.get_num_rounds()):
-            roundkey = key_sch.get_next_key()
+            # Create Table for new block
+            table = PrettyTable()
+            table.field_names = ['Round', 'Operation', 'Byte String']
+            table.align['Operation'] = 'l'
+            table.add_row(['', 'Current Block', ctext])
+            self.log(f'\nCurrent Block {ctext}', debug=True)
 
-            ctext = add_round_key(roundkey, ctext)  # Add round key
-            table.add_row([round_num, f'Add Round Key', ctext])
+            # Encrypt block --------------------------------------------------------------------------------------------
+            for round_num in range(key_sch.get_num_rounds()):
+                roundkey = key_sch.get_next_key()
 
-            ctext = sub_bytes(ctext)  # Sub bytes
-            table.add_row(['', 'Sub Bytes', ctext])
+                ctext = add_round_key(roundkey, ctext)  # Add round key
+                table.add_row([round_num, f'Add Round Key', ctext])
+                self.log(f'{round_num} Add Round Key {ctext}', debug=True)
 
-            mat = Matrix(ctext)  # Convert to 4x4 byte matrix
-            mat.shift_rows()  # Shift rows
-            table.add_row(['', 'Shift Rows', mat.flatten_rows()])
+                ctext = sub_bytes(ctext)  # Sub bytes
+                table.add_row(['', 'Sub Bytes', ctext])
+                self.log(f'Sub Bytes {ctext}', debug=True)
 
-            if key_sch.is_final_round():
-                final_key = key_sch.get_next_key()
+                mat = Matrix(ctext)  # Convert to 4x4 byte matrix
+                mat.shift_rows()  # Shift rows
+                table.add_row(['', 'Shift Rows', mat.flatten_rows()])
+                self.log(f'Shift Rows {mat.flatten_rows()}', debug=True)
+
+                if key_sch.is_final_round():
+                    final_key = key_sch.get_next_key()
+                    ctext = mat.flatten_rows()
+                    ctext = add_round_key(final_key, ctext)  # Add final round key
+                    table.add_row(['', f'Add Round Key', ctext])
+                    break
+                mat.mix_columns()  # Mix Columns
+                table.add_row(['', 'Mix Columns', mat.flatten_rows()])
+                self.log(f'Mix Columns {mat.flatten_rows()}', debug=True)
                 ctext = mat.flatten_rows()
-                ctext = add_round_key(final_key, ctext)  # Add final round key
-                table.add_row(['', f'Add Round Key', ctext])
-                break
-            mat.mix_columns()  # Mix Columns
-            table.add_row(['', 'Mix Columns', mat.flatten_rows()])
-            ctext = mat.flatten_rows()
 
-            table.add_row(['', '', ''])
-        if verbose:
-            result.add_row(
-                [f'Block {block_stream.get_block_num()} Ciphertext:', ctext])
-            result.header = False
-            result.vrules = 0
-            print(table)
-        ctext_result.append(''.join(ctext))
-        key_sch.reset_roundkey_count()
-        # End Encrypt Block --------------------------------------------------------------------------------------------
-    ctext_result = ''.join(ctext_result)
-    if verbose:
-        log(result)
-        log('Encrypted Message:', ctext_result)
-    return ctext_result
+                table.add_row(['', '', ''])
+            if self.verbose:
+                result.add_row(
+                    [f'Block {block_stream.get_block_num()} Ciphertext:', ctext])
+                # self.log(f'Block {block_stream.get_block_num()} Ciphertext: {ctext}', debug=True)
+                result.header = False
+                result.vrules = 0
+                self.log(table)
+            ctext_result.append(''.join(ctext))
+            key_sch.reset_roundkey_count()
+            # End Encrypt Block ----------------------------------------------------------------------------------------
+        ctext_result = ''.join(ctext_result)
+        return ctext_result
 
 
-def decrypt(seed,
-            ciphertext,
-            block_mode: BlockMode = BlockMode.ECB,
-            verbose=False):
-    result = PrettyTable(field_names=None)
-    table = PrettyTable()
+    def decrypt(self, seed, ciphertext):
+        result = PrettyTable(field_names=None)
+        table = PrettyTable()
 
-    key_sch = KeySchedule(seed, decrypt=True)
+        key_sch = KeySchedule(seed, decrypt=True)
 
-    block_stream = BlockStream(ciphertext.lower())
-    ptext_result = []
+        block_stream = BlockStream(ciphertext.lower())
+        ptext_result = []
 
-    while not block_stream.is_empty():
-        # Get next ciphertext block
-        temp = block_stream.get_next_block()
-        if (block_mode is BlockMode.CBC) \
-                and (block_stream.get_block_num() != 1):
-            temp = add_round_key(
-                temp, ptext)  # XOR w/ previous decrypted block (reuse method)
-        ptext = temp
+        while not block_stream.is_empty():
+            # Get next ciphertext block
+            temp = block_stream.get_next_block()
+            if (self.block_mode is BlockMode.CBC) \
+                    and (block_stream.get_block_num() != 1):
+                temp = add_round_key(
+                    temp, ptext)  # XOR w/ previous decrypted block (reuse method)
+            ptext = temp
 
-        # Create Table for new block
-        table.field_names = ['Round', 'Operation', 'Byte String']
-        table.align['Operation'] = 'l'
-        table.add_row(['', 'Current Block', ptext])
-        log(f'Current Block {ptext}', debug=True)
+            # Create Table for new block
+            table.field_names = ['Round', 'Operation', 'Byte String']
+            table.align['Operation'] = 'l'
+            table.add_row(['', 'Current Block', ptext])
+            self.log(f'\nCurrent Block {ptext}', debug=True)
 
-        # Decrypt block ------------------------------------------------------------------------------------------------
-        for round_num in range(key_sch.get_num_rounds()):
-            roundkey = key_sch.get_next_key()
-            ptext = add_round_key(roundkey, ptext)  # Add  round key
-            table.add_row([round_num, f'Add Round Key', ptext])
-            log(f'{round_num} Add Round Key {ptext}', debug=True)
+            # Decrypt block --------------------------------------------------------------------------------------------
+            for round_num in range(key_sch.get_num_rounds()):
+                roundkey = key_sch.get_next_key()
+                ptext = add_round_key(roundkey, ptext)  # Add  round key
+                table.add_row([round_num, f'Add Round Key', ptext])
+                self.log(f'{round_num} Add Round Key {ptext}', debug=True)
 
-            mat = Matrix(ptext)  # Convert to 4x4 byte matrix
+                mat = Matrix(ptext)  # Convert to 4x4 byte matrix
 
-            if round_num > 0:
-                mat.mix_columns(inverse=True)  # Mix Columns
-                table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
-                log(f'Inv Mix Columns {mat.flatten_rows()}', debug=True)
-                ptext = mat.flatten_cols()
+                if round_num > 0:
+                    mat.mix_columns(inverse=True)  # Mix Columns
+                    table.add_row(['', 'Inv Mix Columns', mat.flatten_rows()])
+                    self.log(f'Inv Mix Columns {mat.flatten_rows()}', debug=True)
+                    ptext = mat.flatten_cols()
 
-            mat.shift_rows(inverse=True)  # Inverse shift rows
-            ptext = mat.flatten_rows()
-            table.add_row(['', 'Inv Shift Rows', ptext])
-            log(f'Inv Shift Rows {ptext}', debug=True)
+                mat.shift_rows(inverse=True)  # Inverse shift rows
+                ptext = mat.flatten_rows()
+                table.add_row(['', 'Inv Shift Rows', ptext])
+                self.log(f'Inv Shift Rows {ptext}', debug=True)
 
-            ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
-            table.add_row(['', 'Inv Sub Bytes', ptext])
-            log(f'Inv Sub Bytes {ptext}', debug=True)
+                ptext = sub_bytes(ptext, inverse=True)  # Inverse sub bytes
+                table.add_row(['', 'Inv Sub Bytes', ptext])
+                self.log(f'Inv Sub Bytes {ptext}', debug=True)
 
-            table.add_row(['', '', ''])
-            if key_sch.is_final_round():
-                final_key = key_sch.get_next_key()
-                ptext = add_round_key(ptext, final_key)  # Add final round key
-                table.add_row(['', 'Add Round Key', ptext])
-                log(f'Add Round Key {ptext}')
-                break
+                table.add_row(['', '', ''])
+                if key_sch.is_final_round():
+                    final_key = key_sch.get_next_key()
+                    ptext = add_round_key(ptext, final_key)  # Add final round key
+                    table.add_row(['', 'Add Round Key', ptext])
+                    self.log(f'Add Round Key {ptext}')
+                    break
 
-        log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}')
+            self.log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}')
 
-        if verbose:
-            result.add_row(
-                [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
-            result.header = False
-            result.vrules = 0
-            log(table)
-        ptext_result.append(''.join(ptext))
-        key_sch.reset_roundkey_count()
-        # End Decrypt Block --------------------------------------------------------------------------------------------
-    ctext_result = ''.join(ptext_result)
-    return ctext_result
+            if self.verbose:
+                result.add_row(
+                    [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
+                result.header = False
+                result.vrules = 0
+                self.log(table)
+            ptext_result.append(''.join(ptext))
+            key_sch.reset_roundkey_count()
+            # End Decrypt Block ----------------------------------------------------------------------------------------
+        ctext_result = ''.join(ptext_result)
+        return ctext_result
 
-
-#                                                  /------------------\
-# -------------------------------------------------| Helper Functions |-------------------------------------------------
-#                                                  \------------------/
+    #                                                /------------------\
+    # -----------------------------------------------| Helper Functions |-----------------------------------------------
+    #                                                \------------------/
+    def log(self, msg, debug=False, **kwargs):
+        color = kwargs.get('color', '')
+        if type(msg) is str:
+            msg = color+msg
+        if debug:  # if it is debugging output
+            if self.debug:  # if class-wide debugging output is enabled
+                click.echo(msg)
+            else:
+                return
+        else:
+            click.echo(msg)
 
 def read_file(path):
     click.echo(f'Loading file {Fore.GREEN + path + Style.RESET_ALL}... ', nl=False, color=True)
@@ -172,18 +181,6 @@ def read_file(path):
         click.echo('Process terminated.')
         exit()
     return contents
-
-
-def log(msg, debug=False, **kwargs):
-    color = kwargs.get('color', '')
-    msg = color+msg
-    if debug:  # if it is debugging output
-        if DEBUG:  # if global debugging output is enabled
-            click.echo(msg)
-        else:
-            return
-    else:
-        click.echo(msg)
 
 
 if __name__ == '__main__':
