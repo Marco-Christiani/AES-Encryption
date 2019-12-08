@@ -37,6 +37,10 @@ class BlockStream:
         self.curr_block += 1
         return ''.join(block)
 
+    def get_prev_block(self):
+        block = self.blockstream[self.curr_block-1]
+        return ''.join(block)
+
     def get_block_num(self):
         return self.curr_block
 

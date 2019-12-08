@@ -46,7 +46,6 @@ def demo():
     # Convert to image
     img_bytes = wrap(ctext, 2)
     img_bytes = [hexstr_to_int(b) for b in img_bytes]
-    img_length = len(img_bytes)
     height = 24
     width = 4
     bytearr = np.array(img_bytes).astype(int)

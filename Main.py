@@ -3,7 +3,7 @@ from Matrix_Calculations import *
 from BlockStream import *
 from prettytable import PrettyTable
 from enum import Enum
-from colorama import Fore, Style, init
+from colorama import Fore, Style
 import click
 
 
@@ -79,9 +79,11 @@ class AES():
             ctext_result.append(''.join(ctext))
             key_sch.reset_roundkey_count()
             # End Encrypt Block ----------------------------------------------------------------------------------------
+        if self.verbose:
+            print(result)
+            print('Encrypted Message:', ctext_result)
         ctext_result = ''.join(ctext_result)
         return ctext_result
-
 
     def decrypt(self, seed, ciphertext):
         result = PrettyTable(field_names=None)
@@ -93,13 +95,8 @@ class AES():
         ptext_result = []
 
         while not block_stream.is_empty():
-            # Get next ciphertext block
-            temp = block_stream.get_next_block()
-            if (self.block_mode is BlockMode.CBC) \
-                    and (block_stream.get_block_num() != 1):
-                temp = add_round_key(
-                    temp, ptext)  # XOR w/ previous decrypted block (reuse method)
-            ptext = temp
+            prev_block = block_stream.get_prev_block()  # Save previous ciphertext block for CBC mode
+            ptext = block_stream.get_next_block()  # Get next ciphertext block
 
             # Create Table for new block
             table.field_names = ['Round', 'Operation', 'Byte String']
@@ -139,6 +136,11 @@ class AES():
                     self.log(f'Add Round Key {ptext}', debug=True)
                     break
 
+            if (self.block_mode is BlockMode.CBC) \
+                    and (block_stream.get_block_num() != 1):
+                ptext = add_round_key(
+                    ptext, prev_block)  # XOR w/ previous ciphertext block (reuse method)
+
             self.log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}', debug=True)
 
             if self.verbose:
@@ -146,10 +148,12 @@ class AES():
                     [f'Block {block_stream.get_block_num()} Plaintext:', ptext])
                 result.header = False
                 result.vrules = 0
-                self.log(table)
+                print(table)
             ptext_result.append(''.join(ptext))
             key_sch.reset_roundkey_count()
             # End Decrypt Block ----------------------------------------------------------------------------------------
+        if self.verbose:
+            print(result)
         ctext_result = ''.join(ptext_result)
         return ctext_result
 
