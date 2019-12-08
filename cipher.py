@@ -1,5 +1,6 @@
 from Main import *
 import click
+from colorama import init
 
 
 @click.command()
@@ -8,7 +9,7 @@ import click
 @click.option('-b', '--block-mode', default=1, help='1 for ECB, 2 for CBC')
 @click.option('-tf', '--text-file', type=click.Path(exists=True), help='Input text file.')
 @click.option('-kf', '--key-file', type=click.Path(exists=True), help='Input key file.')
-@click.option('--verbose', type=bool, default=False)
+@click.option('-v', '--verbose', type=bool, default=False, help='Mutually exclusive with debug option')
 @click.option('--debug', type=bool, default=False)
 @click.option('--decrypt', type=bool, default=False)
 def cipher(verbose, debug, block_mode, text=None, key=None, text_file=None, key_file=None, decrypt=False):
@@ -24,10 +25,6 @@ def cipher(verbose, debug, block_mode, text=None, key=None, text_file=None, key_
         output_prompt = 'Plaintext'
 
     if text_file:
-        # txt_path = BASE_PATH+text_file
-        # key_path = BASE_PATH+key_file
-
-        # log(f'\n{"-"*20}{prompt}ing {fname_txt}{"-"*20}')
         aes.log(f'{prompt}ing {text_file}'.center(60, '-'))
         txt = read_file(text_file)
     elif text:

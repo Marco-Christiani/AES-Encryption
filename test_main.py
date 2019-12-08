@@ -2,6 +2,7 @@ from unittest import TestCase
 from Main import *
 
 VERBOSE = False
+DEBUG = False
 
 
 class TestMain(TestCase):
@@ -11,49 +12,70 @@ class TestMain(TestCase):
         self.seed128 = '12476278dbc36bd9dc2cf5716a43b4bb'
         self.seed192 = '9d1e29e03b24b556c16744b9fd5ba204b24b9d1e29e056c1'
         self.seed256 = '18dbc36b277d9d627862dbc36bd9dc2cf5716a43b4bb12c2474cf5716a43b4bb'
-        self.aes = AES(verbose=VERBOSE)
+        self.aes = AES(debug=DEBUG, verbose=VERBOSE)
 
-    def test_encrypt_128_ecb(self):
+    def test_128_ecb(self):
         ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19196a288618c68aac46b475c66783929aacb1' \
                 '2039b1fc7223e7f438e7ba354e19'
         self.aes.set_blockmode(BlockMode.ECB)
         result = self.aes.encrypt(self.seed128, self.ptext)
         self.assertEqual(ctext, result)
 
-    def test_encrypt_128_cbc(self):
+        ptext = self.aes.decrypt(self.seed128, result)
+        self.assertEqual(self.ptext.lower(), ptext.lower())
+
+
+    def test_128_cbc(self):
         ctext = '196a288618c68aac46b475c66783929a62317e77aed691f908680fc692d1ebec2cbccb9460b6a07bb932f18f65aab89dcf29' \
                 '662dd67d683af8904b2e242a2c0c'
         self.aes.set_blockmode(BlockMode.CBC)
         result = self.aes.encrypt(self.seed128, self.ptext)
         self.assertEqual(ctext, result)
 
-    def test_encrypt_192_ecb(self):
+        result = self.aes.decrypt(self.seed128, ctext)
+        self.assertEqual(self.ptext.lower(), result.lower())
+
+
+    def test_192_ecb(self):
         ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48b549204a81419dbef1e439ffb20269cf2fdd' \
                 'dc147fa2bc2c243776858ccd1e48'
         self.aes.set_blockmode(BlockMode.ECB)
         result = self.aes.encrypt(self.seed192, self.ptext)
         self.assertEqual(ctext, result)
 
-    def test_encrypt_192_cbc(self):
+        ptext = self.aes.decrypt(self.seed192, result)
+        self.assertEqual(self.ptext.lower(), ptext.lower())
+
+
+    def test_192_cbc(self):
         ctext = 'b549204a81419dbef1e439ffb20269cf3d5bd54dc704374e1ac6a752342450351c7f7d702b3f840bd7bebd2d691019b720c6' \
                 'a19be88415123ce03bac7a0ae660'
         self.aes.set_blockmode(BlockMode.CBC)
         result = self.aes.encrypt(self.seed192, self.ptext)
         self.assertEqual(ctext, result)
 
-    def test_encrypt_256_ecb(self):
+        ptext = self.aes.decrypt(self.seed192, result)
+        self.assertEqual(self.ptext.lower(), ptext.lower())
+
+    def test_256_ecb(self):
         ctext = 'b421b6541081ad44f56ec3fe3eaa7f651c7854304c08047dceb442d5fb4e5a17b421b6541081ad44f56ec3fe3eaa7f651c78' \
                 '54304c08047dceb442d5fb4e5a17'
         self.aes.set_blockmode(BlockMode.ECB)
         result = self.aes.encrypt(self.seed256, self.ptext)
         self.assertEqual(ctext, result)
 
-    def test_encrypt_256_cbc(self):
+        ptext = self.aes.decrypt(self.seed256, result)
+        self.assertEqual(self.ptext.lower(), ptext.lower())
+
+    def test_256_cbc(self):
         ctext = 'b421b6541081ad44f56ec3fe3eaa7f652721a7c9815abd92c8c70467b75fdafeffbd3cad5f5fecdff6665d3ed8af596cbfbc' \
                 '555d19136c79035cbd0ba6a98570'
         self.aes.set_blockmode(BlockMode.CBC)
-        result = self.aes.encrypt(self.seed256, self.ptext)
-        self.assertEqual(ctext, result)
+        e_result = self.aes.encrypt(self.seed256, self.ptext)
+        self.assertEqual(ctext, e_result)
+
+        d_result = self.aes.decrypt(self.seed256, e_result)
+        self.assertEqual(self.ptext.lower(), d_result)
 
     def test_case_8(self):
         ptext = '0862760c67a0cdc3ede779b9eca00837d5f054da8afb588bce1033373dd9154868ffe11c4338a28a914a834c43d781addad9' \
@@ -73,14 +95,5 @@ class TestMain(TestCase):
         self.aes.set_blockmode(BlockMode.CBC)
         result = self.aes.encrypt(seed, ptext)
         self.assertEqual(ctext_cbc, result)
-
-    def test_decrypt_128_ecb(self):
-        ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19196a288618c68aac46b475c66783929aacb1' \
-                '2039b1fc7223e7f438e7ba354e19'
-
-        self.aes.set_blockmode(BlockMode.ECB)
-        result = self.aes.decrypt(self.seed128, ctext)
-        self.assertEqual(self.ptext.lower(), result.lower())
-
 
 
