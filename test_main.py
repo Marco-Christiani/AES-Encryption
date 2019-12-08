@@ -1,7 +1,6 @@
 from unittest import TestCase
 from Main import *
 
-
 VERBOSE = False
 
 
@@ -81,7 +80,6 @@ class TestMain(TestCase):
 
         self.aes.set_blockmode(BlockMode.ECB)
         result = self.aes.decrypt(self.seed128, ctext)
-        # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
         self.assertEqual(self.ptext.lower(), result.lower())
 
 

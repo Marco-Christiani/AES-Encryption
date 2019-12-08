@@ -13,8 +13,8 @@ pylint = "*"
 coverage = "*"
 pillow = "*"
 matplotlib = "*"
-click = "*"
 colorama = "*"
+click = "*"
 
 [requires]
 python_version = "3.7"
