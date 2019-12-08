@@ -12,7 +12,7 @@ class BlockMode(Enum):
     CBC = 2
 
 class AES():
-    def __init__(self, debug, verbose, block_mode: BlockMode = BlockMode.ECB):
+    def __init__(self, debug=False, verbose=False, block_mode: BlockMode = BlockMode.ECB):
         self.debug = debug
         self.verbose = verbose
         self.block_mode = block_mode
@@ -136,10 +136,10 @@ class AES():
                     final_key = key_sch.get_next_key()
                     ptext = add_round_key(ptext, final_key)  # Add final round key
                     table.add_row(['', 'Add Round Key', ptext])
-                    self.log(f'Add Round Key {ptext}')
+                    self.log(f'Add Round Key {ptext}', debug=True)
                     break
 
-            self.log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}')
+            self.log(f'Block {block_stream.get_block_num()} Plaintext: {ptext}', debug=True)
 
             if self.verbose:
                 result.add_row(
@@ -153,6 +153,8 @@ class AES():
         ctext_result = ''.join(ptext_result)
         return ctext_result
 
+    def set_blockmode(self, block_mode: BlockMode):
+        self.block_mode = block_mode
     #                                                /------------------\
     # -----------------------------------------------| Helper Functions |-----------------------------------------------
     #                                                \------------------/

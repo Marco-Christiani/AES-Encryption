@@ -1,5 +1,8 @@
-from Main import *
 import click
+import matplotlib.pyplot as plt
+from Main import *
+from PIL import Image
+
 
 @click.command()
 @click.option('-k', '--key', help='Key of length 16, 24, or 32 bytes.')
@@ -63,30 +66,52 @@ if __name__ == '__main__':
     ptext= read_file(basepath+'aes-plaintext11.txt')
     key = read_file(basepath+'aes-key11.txt')
     mode = BlockMode.ECB
-    aes = AES(debug=False, verbose=False, block_mode=mode)
-    print('Output:\n', aes.encrypt(key, ptext))
+    aes = AES(verbose=False, block_mode=mode)
+    print(mode)
+    print('Output:\n' + aes.encrypt(key, ptext))
     print()
-    #
-    # ptext_filename = 'aes-plaintext12.txt'
-    # key_filename = 'aes-key12.txt'
-    # mode = BlockMode.ECB
-    # run_encrypt(ptext_filename, key_filename, mode)
-    #
-    # ptext_filename = 'aes-plaintext13.txt'
-    # key_filename = 'aes-key13.txt'
-    # mode = BlockMode.ECB
-    # run_encrypt(ptext_filename, key_filename, mode)
-    #
-    # ptext_filename = 'aes-plaintext13.txt'
-    # key_filename = 'aes-key13.txt'
-    # mode = BlockMode.CBC
-    # run_encrypt(ptext_filename, key_filename, mode)
 
-    # ctext_filename = 'aes-ciphertext10-cbc.txt'
-    # key_filename = 'aes-key10.txt'
-    # mode = BlockMode.CBC
+    ptext= read_file(basepath+'aes-plaintext12.txt')
+    key = read_file(basepath+'aes-key12.txt')
+    mode = BlockMode.ECB
+    aes = AES(verbose=False, block_mode=mode)
+    print(mode)
+    print('Output:\n' + aes.encrypt(key, ptext))
+    print()
+
+    ptext= read_file(basepath+'aes-plaintext13.txt')
+    key = read_file(basepath+'aes-key13.txt')
+    mode = BlockMode.ECB
+    aes = AES(verbose=False, block_mode=mode)
+    print(mode)
+    print('Output:\n' + aes.encrypt(key, ptext))
+    print()
+
+    mode = BlockMode.CBC
+    aes = AES(verbose=False, block_mode=mode)
+    print(mode)
+    print('Output:\n' + aes.encrypt(key, ptext))
+    print()
+
+    ctext= read_file(basepath+'aes-ciphertext10-cbc.txt')
+    key = read_file(basepath+'aes-key10.txt')
+    mode = BlockMode.CBC
+    aes = AES(verbose=False, block_mode=mode)
+    print(mode)
+    ptext = aes.decrypt(key, ctext)
+    print('Output:\n' + ptext)
+
+    # Convert to image
+    # img_bytes = wrap(ctext, 2)
+    # img_bytes = [hexstr_to_int(b) for b in img_bytes]
+    # img_length = len(img_bytes)
+    # height = 12
+    # width = 8
+    # bytearr = np.array(img_bytes).astype(int)
+    # bytearr = bytearr.reshape( (width, height) )
     #
-    # print(len(wrap(read_file(BASE_PATH+ ctext_filename), 2)))
-    # print(len(wrap(read_file(BASE_PATH+ key_filename), 2)))
-    #
-    # cipher(ctext_filename, key_filename, mode, _decrypt=True)
+    # im = Image.fromarray(bytearr, mode='L')
+    # plt.gray()
+    # plt.imshow(im)
+    # plt.show()
+

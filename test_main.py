@@ -1,7 +1,5 @@
 from unittest import TestCase
 from Main import *
-from PIL import Image
-import matplotlib.pyplot as plt
 
 
 VERBOSE = False
@@ -14,50 +12,48 @@ class TestMain(TestCase):
         self.seed128 = '12476278dbc36bd9dc2cf5716a43b4bb'
         self.seed192 = '9d1e29e03b24b556c16744b9fd5ba204b24b9d1e29e056c1'
         self.seed256 = '18dbc36b277d9d627862dbc36bd9dc2cf5716a43b4bb12c2474cf5716a43b4bb'
+        self.aes = AES(verbose=VERBOSE)
 
     def test_encrypt_128_ecb(self):
         ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19196a288618c68aac46b475c66783929aacb1' \
                 '2039b1fc7223e7f438e7ba354e19'
-        result = encrypt(self.seed128, self.ptext, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.ECB)
+        result = self.aes.encrypt(self.seed128, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_encrypt_128_cbc(self):
         ctext = '196a288618c68aac46b475c66783929a62317e77aed691f908680fc692d1ebec2cbccb9460b6a07bb932f18f65aab89dcf29' \
                 '662dd67d683af8904b2e242a2c0c'
-        result = encrypt(self.seed128,
-                         self.ptext,
-                         BlockMode.CBC,
-                         verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.CBC)
+        result = self.aes.encrypt(self.seed128, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_encrypt_192_ecb(self):
         ctext = 'b549204a81419dbef1e439ffb20269cf2fdddc147fa2bc2c243776858ccd1e48b549204a81419dbef1e439ffb20269cf2fdd' \
                 'dc147fa2bc2c243776858ccd1e48'
-        result = encrypt(self.seed192, self.ptext, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.ECB)
+        result = self.aes.encrypt(self.seed192, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_encrypt_192_cbc(self):
         ctext = 'b549204a81419dbef1e439ffb20269cf3d5bd54dc704374e1ac6a752342450351c7f7d702b3f840bd7bebd2d691019b720c6' \
                 'a19be88415123ce03bac7a0ae660'
-        result = encrypt(self.seed192,
-                         self.ptext,
-                         BlockMode.CBC,
-                         verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.CBC)
+        result = self.aes.encrypt(self.seed192, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_encrypt_256_ecb(self):
         ctext = 'b421b6541081ad44f56ec3fe3eaa7f651c7854304c08047dceb442d5fb4e5a17b421b6541081ad44f56ec3fe3eaa7f651c78' \
                 '54304c08047dceb442d5fb4e5a17'
-        result = encrypt(self.seed256, self.ptext, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.ECB)
+        result = self.aes.encrypt(self.seed256, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_encrypt_256_cbc(self):
         ctext = 'b421b6541081ad44f56ec3fe3eaa7f652721a7c9815abd92c8c70467b75fdafeffbd3cad5f5fecdff6665d3ed8af596cbfbc' \
                 '555d19136c79035cbd0ba6a98570'
-        result = encrypt(self.seed256,
-                         self.ptext,
-                         BlockMode.CBC,
-                         verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.CBC)
+        result = self.aes.encrypt(self.seed256, self.ptext)
         self.assertEqual(ctext, result)
 
     def test_case_8(self):
@@ -71,40 +67,22 @@ class TestMain(TestCase):
         ctext_cbc = '1c47ecadaef89648085cdb40949f5fc9011eadff1d9dbefea1ca6c82c93640040614d2a84e512c4a213ec5b6c7d29834' \
                     'c0762a0daa22298e3cb062828f155f8b7d4678f4bac3e3688ee420b486fbaa1cda87ac811c62e4ad1613222c6ada8ddc' \
                     '861a6f10faaecc3f14cd8271dd66ddb220ac0fda50f47050cac22bd829df6d0d'
-
-        result = encrypt(seed, ptext, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.ECB)
+        result = self.aes.encrypt(seed, ptext)
         self.assertEqual(ctext_ecb, result)
 
-        result = encrypt(seed, ptext, BlockMode.CBC, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.CBC)
+        result = self.aes.encrypt(seed, ptext)
         self.assertEqual(ctext_cbc, result)
 
     def test_decrypt_128_ecb(self):
         ctext = '196a288618c68aac46b475c66783929aacb12039b1fc7223e7f438e7ba354e19196a288618c68aac46b475c66783929aacb1' \
                 '2039b1fc7223e7f438e7ba354e19'
 
-        result = decrypt(self.seed128, ctext, verbose=VERBOSE)
+        self.aes.set_blockmode(BlockMode.ECB)
+        result = self.aes.decrypt(self.seed128, ctext)
         # result = decrypt_backup(self.seed128, ctext, verbose=VERBOSE)
         self.assertEqual(self.ptext.lower(), result.lower())
 
-    #  TODO implement padding
-
-    def test_img(self):
-        img_bytes='89504e470d0a1a0a0000000d4948445257e9fed303dfcd891e80b4fceaaf26828f181937201884c78d20718f21a0f9c5ea9b' \
-                  '96172549243e75fa5964182f220df7c0d250f6656edd0d7db0863da51ca678532d9a63f6385e2ca6864e94dc48d7'
-        img_bytes = wrap(img_bytes, 2)
-        img_bytes = [hexstr_to_int(b) for b in img_bytes]
-        img_length = len(img_bytes)
-        height = 12
-        width = 8
-        bytearr = np.array(img_bytes).astype(int)
-        bytearr = bytearr.reshape( (width, height) )
-
-        # bytearr.astype(np.uint8)
-
-        im = Image.fromarray(bytearr, mode='L')
-        # im.show()
-        plt.gray()
-        plt.imshow(im)
-        plt.show()
 
 
