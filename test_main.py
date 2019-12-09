@@ -111,6 +111,8 @@ class TestMain(TestCase):
         p = 'a1b2c3d4e5f6778888776f5e4d3c2b1a'
         c = '4c77e6ea58d64755b8deb26c042c6e5f'
         for byte in wrap(p, 2):
+
+
             if byte in wrap(c,2):
                 print(byte)
 
