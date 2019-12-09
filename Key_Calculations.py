@@ -30,7 +30,16 @@ SBOX = [
 
 
 class KeySchedule:
+    """
+    Creates an AES key schedule by expanding an initial key (seed) and stores the expanded result as a list of subkeys.
+    """
     def __init__(self, seed, decrypt=False):
+        """
+        Sets up a KeySchedule with user options.
+
+        :param seed: key to be expanded
+        :param decrypt: if true, reverses key schedule order
+        """
         self.key = []  # byte array as strings i.e. ['0a', '2f', ...]
         self.key_schedule = []  # expanded key broken into round keys
         self.curr_round = 0
@@ -53,7 +62,8 @@ class KeySchedule:
 
     def key_expansion_128(self, seed):
         """
-        128 byte expansion
+        Expands 16 byte key to 128 byte keyschedule, according to AES specification.
+
         :param seed: array of hex digits [A2, 5D, E4...]
         """
         key = seed
@@ -90,7 +100,8 @@ class KeySchedule:
 
     def key_expansion_192(self, seed):
         """
-        192 byte expansion
+        Expands 24 byte key to 192 byte keyschedule, according to AES specification.
+
         :param seed: array of hex digits [A2, 5D, E4...]
         """
         key = seed
@@ -127,7 +138,8 @@ class KeySchedule:
 
     def key_expansion_256(self, seed):
         """
-        256 byte expansion is a special case
+        Expands 32 byte key to 256 byte keyschedule, according to AES specification.
+
         :param seed: array of hex digits [A2, 5D, E4...]
         """
         key = seed
@@ -169,8 +181,9 @@ class KeySchedule:
 
     def get_next_key(self):
         """
-        Gets next key from 0 to num_keys
-        :return:
+        Gets next key in key schedule from 0 to num_keys
+
+        :return: next key
         """
         result = self.key_schedule[self.curr_round]
         self.curr_round += 1
@@ -186,8 +199,10 @@ class KeySchedule:
         self.curr_round = 0
 
 
-def key_expansion_core(key, i):
+def key_expansion_core(key: list[str], i: int) -> str:
     """
+    Key Expansion Core according to AES specification.
+
     :param key: array of hex digits as strings ie [A2, 5D, ..]
     :param i: number of times this function has been called
     """
@@ -210,8 +225,10 @@ def key_expansion_core(key, i):
     return key
 
 
-def get_XOR(x, y):
+def get_XOR(x: str, y: str) -> str:
     """
+    Performs an XOR between two bytes as hex strings
+
     :param x: hex digits as string ie 'A2'
     :param y: x XOR y as string
     :return:
@@ -221,12 +238,13 @@ def get_XOR(x, y):
     return result
 
 
-def add_round_key(key, text):
+def add_round_key(key: str, text: str) -> str:
     """
-    len(key) == len(text)
+    Performs an XOR between each byte of key and text
+
     :param key: string of bytes
     :param text: string of bytes
-    :return:
+    :return: key XOR text
     """
     result = ''
     kbytes = wrap(key, 2)
@@ -253,6 +271,12 @@ def int_to_hexstr(number):
 
 
 def sub_bytes(bytes, inverse=False):
+    """
+    Substitute bytes according to SBOX constant
+
+    :param bytes: string or array of bytes
+    :return: string representation of substituted bytes
+    """
     if type(bytes) is str:
         bytes = wrap(bytes, 2)
 

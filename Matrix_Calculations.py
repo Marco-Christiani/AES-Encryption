@@ -9,7 +9,15 @@ ARR_INV = np.array([[14, 11, 13, 9], [9, 14, 11, 13], [13, 9, 14, 11],
 
 
 class Matrix:
+    """
+    Implements matrix operations defined in AES Standard by parsing a 16 byte input string into a 4x4 matrix.
+    """
     def __init__(self, data: str):
+        """
+        Splits data into string represented bytes (without "0x") and stores as a 4x4 matrix
+
+        :param data: string of 16 bytes i.e. "a1b3d6..." (32 characters in length)
+        """
         self.matrix = np.empty([4, 4], dtype='U2')
         i = 0
         data = wrap(data, 2)
@@ -97,7 +105,12 @@ def mult(a, b):
     return mod_p(result)
 
 
-def mod_p(number):
+def mod_p(number: int) -> int:
+    """
+    Computes the mod of a number with the AES constant. Repeatedly left align and mod's if necessary.
+    :param number: number to be mod'd
+    :returns: number mod P as int
+    """
     bit_rep = bin(int(number))
     num_bits = len([c for c in bit_rep.split('0b')[1]])
     while num_bits > 8:

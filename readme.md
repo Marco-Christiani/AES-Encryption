@@ -21,7 +21,7 @@ sudo pip3 install pipenv
 
 Now that the virtual environment has been setup, dependencies are installed and all that is left is to activate the environment.
 
-```pipenv shell``` will drop you into the virtual environment and all occurences of the ```python``` command in the remainder of this document assumes the ```pipenv shell``` command has been run.
+```pipenv shell``` will drop you into the virtual environment and all occurences of the ```python``` command in the remainder of this document assumes the ```pipenv shell``` command has been run. The virtual environment can be exited with ```exit```.
 
 **Note that if you successfully activated the virtual environment ```(AES-Encryption)``` will appear beside the bash prompt**
 

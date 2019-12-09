@@ -2,14 +2,21 @@ from textwrap import wrap
 
 
 class BlockStream:
-    def __init__(self, textstream, decrypt: bool = False):
-        self.textstream = textstream
-        self.blockstream = []
+    """
+    Provides an abstracted way of parsing the input text stream (either plaintext or ciphertext)
+    """
+    def __init__(self, textstream: str):
+        self.textstream = textstream  # Stores original text string
+        self.blockstream = []  # Stores 16 byte blocks as sublists
         self.curr_block = 0
         self.blocksize = 16  # 16 bytes
-        self.parse_blocks(decrypt)
+        self.parse_blocks()
 
-    def parse_blocks(self, decrypt=False):
+    def parse_blocks(self):
+        """
+        Parses text stream into 16 byte blocks stored as sublists of hex numbers as strings.
+        For example: [ ['01', '02', ..., '0f'], ..., ['a1', 'a2', ... 'af'] ]
+        """
         bytes = wrap(self.textstream, 2)
         full_blocks = [
             bytes[i:i + self.blocksize]
@@ -29,8 +36,6 @@ class BlockStream:
             padded_block += partial_block
             self.blockstream = full_blocks + padded_block
         # -----------------------------------------------------------
-        if decrypt:
-            self.blockstream = list(reversed(self.blockstream))
 
     def get_next_block(self):
         block = self.blockstream[self.curr_block]
