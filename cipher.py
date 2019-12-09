@@ -6,13 +6,17 @@ from colorama import init
 @click.command()
 @click.option('-k', '--key', help='Key of length 16, 24, or 32 bytes.')
 @click.option('-t', '--text', help='Text to encrypt (block padding is currently not supported).')
-@click.option('-b', '--block-mode', default=1, help='1 for ECB, 2 for CBC')
+@click.option('-b', '--block-mode', default=1, help='Set to 1 for ECB, 2 for CBC')
 @click.option('-tf', '--text-file', type=click.Path(exists=True), help='Input text file.')
 @click.option('-kf', '--key-file', type=click.Path(exists=True), help='Input key file.')
-@click.option('-v', '--verbose', type=bool, default=False, help='Mutually exclusive with debug option')
-@click.option('--debug', type=bool, default=False)
-@click.option('--decrypt', type=bool, default=False)
+@click.option('-v', '--verbose', type=bool, default=False,
+              help='Set to 1 for verbose mode. Mutually exclusive with debug option.')
+@click.option('--debug', type=bool, default=False, help='Set to 1 for debug mode.')
+@click.option('--decrypt', type=bool, default=False, help='Set to 1 for decrypt mode.')
 def cipher(verbose, debug, block_mode, text=None, key=None, text_file=None, key_file=None, decrypt=False):
+    """
+    Offers a command line interface for the AES class
+    """
     if debug:
         verbose = False
     block_mode = BlockMode(block_mode)

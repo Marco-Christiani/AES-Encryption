@@ -160,6 +160,7 @@ class AES():
 
     def set_blockmode(self, block_mode: BlockMode):
         self.block_mode = block_mode
+        
     #                                                /------------------\
     # -----------------------------------------------| Helper Functions |-----------------------------------------------
     #                                                \------------------/
@@ -175,6 +176,7 @@ class AES():
         else:
             click.echo(msg)
 
+
 def read_file(path):
     click.echo(f'Loading file {Fore.GREEN + path + Style.RESET_ALL}... ', nl=False, color=True)
     f = open(path)
@@ -188,7 +190,3 @@ def read_file(path):
         click.echo('Process terminated.')
         exit()
     return contents
-
-
-if __name__ == '__main__':
-    init(autoreset=True)
