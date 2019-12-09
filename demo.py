@@ -44,10 +44,10 @@ def demo():
     print('Output:\n' + ptext)
 
     # Convert to image
-    img_bytes = wrap(ctext, 2)
+    img_bytes = wrap(ptext, 2)
     img_bytes = [hexstr_to_int(b) for b in img_bytes]
-    height = 24
-    width = 4
+    height = 12
+    width = 8
     bytearr = np.array(img_bytes).astype(int)
     bytearr = bytearr.reshape( (height, width) )
 

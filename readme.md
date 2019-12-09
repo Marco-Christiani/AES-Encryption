@@ -9,9 +9,20 @@
 ```
 unzip AES-Encryption.zip
 cd AES-Encryption
-pipenv install
+pipenv install # This might take a moment
 ```
-If pipenv is not installed, install with ```pip install pipenv```
+If pipenv or pip is not installed, install with
+```
+sudo apt update
+sudo apt install python3-pip -y
+sudo pip3 install pipenv
+```
+*This application was built with Python 3.7*
+
+Now that the virtual environment has been setup, dependencies are installed and all that is left is to activate the environment.
+```pipenv shell``` will drop you into the virtual environment and all occurences of the ```python``` command in the remainder of this document assumes the ```pipenv shell``` command has been run.
+**Note that if you successfully activated the virtual environment ```(AES-Encryption)``` will appear beside the bash prompt**
+*Alternatively, you can remain outside the virtual environment and the ```python``` command can be replaced with ```pipenv run```*
 
 <a name="cmdline"></a>
 ## Command Line Tool

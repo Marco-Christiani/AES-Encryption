@@ -11,6 +11,7 @@ class BlockMode(Enum):
     ECB = 1
     CBC = 2
 
+
 class AES():
     def __init__(self, debug=False, verbose=False, block_mode: BlockMode = BlockMode.ECB):
         self.debug = debug
