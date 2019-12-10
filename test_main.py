@@ -96,24 +96,5 @@ class TestMain(TestCase):
         result = self.aes.encrypt(seed, ptext)
         self.assertEqual(ctext_cbc, result)
 
-    def test_diff(self):
-        """
-        pt = 'f921ade849c8aac7b2036636443aed99'
-        bits = [bin(hexstr_to_int(b)) for b in pt]
-        bits = ''.join(bits)
-        bits = ''.join(bits.split('0b'))
-
-        xor = add_round_key('838958fb8c24640f8f23d161f9666329', 'a1823eb7b6d0de74f5f943f0aee6d11e') # XOR
-        bits = [bin(hexstr_to_int(b)) for b in xor]
-        bits = ''.join(bits)
-        bits.count('1') # 61
-        """
-        p = 'a1b2c3d4e5f6778888776f5e4d3c2b1a'
-        c = '4c77e6ea58d64755b8deb26c042c6e5f'
-        for byte in wrap(p, 2):
-
-
-            if byte in wrap(c,2):
-                print(byte)
 
 

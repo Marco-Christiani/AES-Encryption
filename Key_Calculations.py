@@ -199,7 +199,7 @@ class KeySchedule:
         self.curr_round = 0
 
 
-def key_expansion_core(key: list[str], i: int) -> str:
+def key_expansion_core(key: list, i: int) -> str:
     """
     Key Expansion Core according to AES specification.
 
