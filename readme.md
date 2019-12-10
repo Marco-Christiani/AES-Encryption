@@ -11,7 +11,7 @@ unzip AES-Encryption.zip
 cd AES-Encryption
 pipenv install # This might take a moment
 ```
-If pipenv or pip is not installed, install with
+If pipenv or pip is not installed, install with ```chmod +x; sudo ./install.sh``` or:
 ```
 sudo apt update
 sudo apt install python3-pip -y
@@ -72,6 +72,7 @@ There are 8 test cases, output asserted against output from AES Web App. Each te
 5. test_256_ecb
 6. test_256_cbc
 7. test_case_8
+
 These tests can be run with ```python -m unittest discover```
 
 <a name="demo"></a>
